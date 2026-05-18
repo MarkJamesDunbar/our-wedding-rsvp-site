@@ -50,7 +50,16 @@ const buildRsvpText = () => {
 };
 
 const updatePreview = () => {
-  preview.textContent = buildRsvpText();
+  const hasMeaningfulInput =
+    cleanText(guestNameInput.value, 80) ||
+    cleanText(guestEmailInput.value, 120) ||
+    cleanText(attendanceInput.value, 40) ||
+    cleanText(dietaryNotesInput.value, 300) ||
+    cleanText(guestMessageInput.value, 400);
+
+  preview.textContent = hasMeaningfulInput
+    ? buildRsvpText()
+    : "Complete the form to preview your RSVP.";
 };
 
 const setStatus = (message) => {

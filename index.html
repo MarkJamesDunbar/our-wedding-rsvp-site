@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alex & Jamie's Wedding RSVP</title>
+    <meta
+      name="description"
+      content="Wedding invitation, RSVP form, venue details, menu, theme, travel tips, and accommodation information."
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'none'; form-action 'self' mailto:; img-src 'self' data:; object-src 'none'; script-src 'self'; style-src 'self'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero card">
+        <p class="eyebrow">You're invited</p>
+        <h1>Alex & Jamie are getting married</h1>
+        <p class="lede">
+          Join us for a relaxed countryside celebration with good food, live music,
+          and a weekend full of family and friends.
+        </p>
+        <div class="hero-grid">
+          <div>
+            <h2>Saturday, 14 June 2026</h2>
+            <p>Willowbrook Hall, Bath, Somerset</p>
+            <p>Ceremony at 2:00 PM · Carriages at midnight</p>
+          </div>
+          <div class="share-card">
+            <h2>Share this invitation</h2>
+            <label class="sr-only" for="invite-link">Invitation link</label>
+            <input id="invite-link" class="share-input" type="text" readonly />
+            <button id="copy-link" class="button button-secondary" type="button">
+              Copy invitation link
+            </button>
+            <p class="helper">
+              Want a personalised link or QR code? Add <code>?invite=Guest+Name</code>
+              before sharing.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="info-grid">
+        <article class="card">
+          <h2>The plan</h2>
+          <ul class="stacked-list">
+            <li><strong>1:30 PM</strong> Guests arrive and find their seats</li>
+            <li><strong>2:00 PM</strong> Outdoor ceremony in the rose garden</li>
+            <li><strong>3:00 PM</strong> Drinks, canapés, and photographs</li>
+            <li><strong>5:00 PM</strong> Wedding breakfast and speeches</li>
+            <li><strong>8:00 PM</strong> First dance and evening party</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Theme & dress code</h2>
+          <p>
+            Think summer garden party: soft colours, florals, and anything you can
+            dance comfortably in.
+          </p>
+          <p>
+            Please bring a light layer for the evening. The ceremony is outside, but
+            the reception moves indoors if the weather turns.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>Menu</h2>
+          <ul class="stacked-list">
+            <li><strong>Starter:</strong> Roasted tomato tart with basil oil</li>
+            <li><strong>Main:</strong> Herb chicken or wild mushroom risotto</li>
+            <li><strong>Dessert:</strong> Lemon posset with summer berries</li>
+            <li><strong>Evening:</strong> Wood-fired pizza and dancing snacks</li>
+          </ul>
+          <p class="helper">Use the RSVP form to tell us about dietary needs.</p>
+        </article>
+
+        <article class="card">
+          <h2>Venue & maps</h2>
+          <p>Willowbrook Hall, Mill Lane, Bath, BA2 8RS</p>
+          <div class="link-list">
+            <a
+              href="https://maps.google.com/?q=Willowbrook+Hall+Bath"
+              target="_blank"
+              rel="noreferrer noopener"
+              >Open in Google Maps</a
+            >
+            <a
+              href="https://www.openstreetmap.org/search?query=Willowbrook%20Hall%20Bath"
+              target="_blank"
+              rel="noreferrer noopener"
+              >Open in OpenStreetMap</a
+            >
+          </div>
+          <p class="helper">Free parking is available on site, and taxis can pick up at the main entrance.</p>
+        </article>
+
+        <article class="card">
+          <h2>Hotels nearby</h2>
+          <ul class="stacked-list">
+            <li>The Bath House Hotel · 10 minutes by taxi</li>
+            <li>Riverside Inn · 15 minutes by taxi</li>
+            <li>Willowbrook Rooms · Limited rooms on site</li>
+          </ul>
+          <p class="helper">We recommend booking early if you want to stay locally.</p>
+        </article>
+
+        <article class="card">
+          <h2>Getting there</h2>
+          <ul class="stacked-list">
+            <li>Closest rail station: Bath Spa</li>
+            <li>Taxi from Bath Spa: roughly 20 minutes</li>
+            <li>From Bristol Airport: around 50 minutes by car</li>
+            <li>Coach drop-off and accessible parking are available</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="card rsvp-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">RSVP</p>
+            <h2>Let us know if you can make it</h2>
+          </div>
+          <p class="helper">
+            Your details stay in this browser until you choose to send them by email.
+          </p>
+        </div>
+
+        <form id="rsvp-form" novalidate>
+          <div class="form-grid">
+            <label>
+              Full name
+              <input id="guest-name" name="guestName" type="text" maxlength="80" required />
+            </label>
+
+            <label>
+              Email address
+              <input id="guest-email" name="guestEmail" type="email" maxlength="120" required />
+            </label>
+
+            <label>
+              Can you attend?
+              <select id="attendance" name="attendance" required>
+                <option value="">Please choose</option>
+                <option value="Accepts with pleasure">Accepts with pleasure</option>
+                <option value="Sadly declines">Sadly declines</option>
+              </select>
+            </label>
+
+            <label>
+              Total guests in your party
+              <input
+                id="guest-count"
+                name="guestCount"
+                type="number"
+                min="1"
+                max="6"
+                value="1"
+                inputmode="numeric"
+                required
+              />
+            </label>
+
+            <label class="full-width">
+              Dietary requirements
+              <textarea
+                id="dietary-notes"
+                name="dietaryNotes"
+                rows="3"
+                maxlength="300"
+                placeholder="Let us know about allergies, vegetarian choices, or children's meals."
+              ></textarea>
+            </label>
+
+            <label class="full-width">
+              Message for the couple
+              <textarea
+                id="guest-message"
+                name="guestMessage"
+                rows="4"
+                maxlength="400"
+                placeholder="Optional message, song request, or travel question."
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="button-row">
+            <button class="button" type="submit">Prepare RSVP email</button>
+            <button id="copy-rsvp" class="button button-secondary" type="button">
+              Copy RSVP details
+            </button>
+          </div>
+          <p id="form-status" class="status" aria-live="polite"></p>
+        </form>
+
+        <div class="preview-panel" aria-live="polite">
+          <h3>RSVP preview</h3>
+          <pre id="rsvp-preview">Complete the form to preview your RSVP.</pre>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

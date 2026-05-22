@@ -40,7 +40,7 @@ Sans:   Raleway — 300, 400, 600, 700, 800
 | Eyebrow label | Raleway | `0.56rem` | 700 · uppercase · `letter-spacing: 0.38em` |
 | Body copy | Raleway | `0.875rem` | 400 · `line-height: 1.85` |
 | Button / nav | Raleway | `0.58rem` | 700 · uppercase · `letter-spacing: 0.22em` |
-
+ 
 ---
 
 ## Key Rules

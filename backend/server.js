@@ -95,8 +95,6 @@ async function initDatabase() {
   }
 }
 
-initDatabase();
-
 // Get invitation
 app.get('/api/invitation/:invitation_id', (req, res) => {
   console.log('📖 GET /api/invitation/', req.params.invitation_id);
@@ -245,6 +243,9 @@ app.get('/api/admin/export-csv', (req, res) => {
   );
 });
 
-app.listen(3001, () => {
-  console.log('✓ Server running on port 3001');
-});
+(async () => {
+  await initDatabase();
+  app.listen(3001, () => {
+    console.log('✓ Server running on port 3001');
+  });
+})();

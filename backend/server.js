@@ -10,6 +10,19 @@ app.use(express.json());
 
 console.log('🚀 Server starting...');
 console.log('DATABASE_URL:', process.env.DATABASE_URL ? '✓ Set' : '✗ NOT SET');
+console.log('=== ENVIRONMENT DEBUG ===');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+if (process.env.DATABASE_URL) {
+  const url = new URL(process.env.DATABASE_URL);
+  console.log('DB Host:', url.hostname);
+  console.log('DB Port:', url.port);
+  console.log('DB Name:', url.pathname);
+  console.log('Full URL:', process.env.DATABASE_URL);
+} else {
+  console.log('⚠️  DATABASE_URL is NOT set!');
+}
+console.log('=== END DEBUG ===');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL

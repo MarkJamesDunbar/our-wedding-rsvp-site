@@ -36,38 +36,66 @@ pool.on('connect', () => {
   console.log('✓ Connected to PostgreSQL');
 });
 
-// Create tables with logging
-pool.query(`
-  CREATE TABLE IF NOT EXISTS invitations (
-    id TEXT PRIMARY KEY,
-    invite_id TEXT,
-    primary_guest TEXT,
-    party_size INTEGER,
-    guests TEXT
-  )
-`, (err) => {
-  if (err) console.error('❌ Failed to create invitations table:', err.message);
-  else console.log('✓ Invitations table ready');
-});
+// Seed invitations from invitations.json (runs once on startup)
+async function seedInvitations() {
+  console.log('🌱 Seeding invitations from invitations.json...');
+  try {
+    const invitationsPath = path.join(__dirname, 'invitations.json');
+    console.log('📂 Reading:', invitationsPath);
+    const invitations = JSON.parse(fs.readFileSync(invitationsPath, 'utf8'));
+    const entries = Object.values(invitations);
+    console.log('📋 Found', entries.length, 'invitations to seed');
 
-pool.query(`
-  CREATE TABLE IF NOT EXISTS responses (
-    id SERIAL PRIMARY KEY,
-    invitation_id TEXT UNIQUE,
-    response_data TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  )
-`, (err) => {
-  if (err) console.error('❌ Failed to create responses table:', err.message);
-  else console.log('✓ Responses table ready');
-});
+    let seeded = 0;
+    for (const inv of entries) {
+      await pool.query(
+        `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests)
+         VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
+        [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)]
+      );
+      seeded++;
+    }
+    console.log('✓ Seeded', seeded, 'invitations (duplicates skipped)');
+  } catch (err) {
+    console.warn('⚠️  Seeding failed — server will continue without seed data:', err.message);
+  }
+}
 
-// Test connection
-pool.query('SELECT NOW()', (err, result) => {
-  if (err) console.error('❌ Database test query failed:', err.message);
-  else console.log('✓ Database connection working');
-});
+// Create tables then seed
+async function initDatabase() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS invitations (
+        id TEXT PRIMARY KEY,
+        invite_id TEXT,
+        primary_guest TEXT,
+        party_size INTEGER,
+        guests TEXT
+      )
+    `);
+    console.log('✓ Invitations table ready');
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS responses (
+        id SERIAL PRIMARY KEY,
+        invitation_id TEXT UNIQUE,
+        response_data TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✓ Responses table ready');
+
+    await pool.query('SELECT NOW()');
+    console.log('✓ Database connection working');
+
+    await seedInvitations();
+  } catch (err) {
+    console.error('❌ Database initialisation failed:', err.message);
+  }
+}
+
+initDatabase();
 
 // Get invitation
 app.get('/api/invitation/:invitation_id', (req, res) => {
@@ -215,42 +243,6 @@ app.get('/api/admin/export-csv', (req, res) => {
       }
     }
   );
-});
-
-// Seed endpoint
-app.get('/api/seed', async (req, res) => {
-  console.log('📝 GET /api/seed');
-  try {
-    const invitationsPath = path.join(__dirname, 'invitations.json');
-    console.log('📂 Reading:', invitationsPath);
-    const invitations = JSON.parse(fs.readFileSync(invitationsPath));
-    console.log('📋 Found', Object.keys(invitations).length, 'invitations');
-    
-    let seeded = 0;
-    for (const inv of Object.values(invitations)) {
-      await new Promise((resolve, reject) => {
-        pool.query(
-          `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests) 
-           VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
-          [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)],
-          (err) => {
-            if (err) {
-              console.error('❌ Insert failed for', inv.qr_code, ':', err.message);
-              reject(err);
-            } else {
-              seeded++;
-              resolve();
-            }
-          }
-        );
-      });
-    }
-    console.log('✓ Seeded', seeded, 'invitations');
-    res.json({ seeded, message: 'Invitations seeded successfully' });
-  } catch (err) {
-    console.error('❌ Seed error:', err.message);
-    res.status(500).json({ error: err.message });
-  }
 });
 
 app.listen(3001, () => {

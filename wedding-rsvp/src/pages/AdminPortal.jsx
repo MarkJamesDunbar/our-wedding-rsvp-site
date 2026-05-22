@@ -11,7 +11,7 @@ export default function AdminPortal() {
 
   const fetchAllResponses = () => {
     setLoading(true);
-    fetch('http://localhost:3001/api/admin/all-responses')
+    fetch('https://our-wedding-rsvp-site-production.up.railway.app/api/admin/all-responses')
       .then(res => res.json())
       .then(data => {
         setResponses(data.responses || []);
@@ -25,7 +25,7 @@ export default function AdminPortal() {
   };
 
   const downloadCSV = () => {
-    window.location.href = 'http://localhost:3001/api/admin/export-csv';
+    window.location.href = 'https://our-wedding-rsvp-site-production.up.railway.app/api/admin/export-csv';
   };
 
   if (loading) return <div style={{ padding: '20px' }}>Loading...</div>;

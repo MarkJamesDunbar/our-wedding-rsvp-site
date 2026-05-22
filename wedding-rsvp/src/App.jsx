@@ -18,14 +18,14 @@ function AppContent() {
       return;
     }
 
-    fetch(`http://localhost:3001/api/invitation/${invitationId}`)
+    fetch(`https://our-wedding-rsvp-site-production.up.railway.app/api/invitation/${invitationId}`)
       .then(res => {
         if (!res.ok) throw new Error('Not found');
         return res.json();
       })
       .then(data => {
         setInvitation(data);
-        return fetch(`http://localhost:3001/api/get-response/${invitationId}`);
+        return fetch(`https://our-wedding-rsvp-site-production.up.railway.app/api/get-response/${invitationId}`);
       })
       .then(res => res.json())
       .then(data => {
@@ -42,7 +42,7 @@ function AppContent() {
   }, [invitationId]);
 
   const handleRsvpSubmit = async (responses) => {
-    await fetch('http://localhost:3001/api/save-response', {
+    await fetch('https://our-wedding-rsvp-site-production.up.railway.app/api/save-response', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ invitation_id: invitationId, response_data: responses })

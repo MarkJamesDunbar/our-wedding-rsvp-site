@@ -175,4 +175,24 @@ app.get('/api/admin/export-csv', (req, res) => {
   );
 });
 
+app.get('/api/seed', (req, res) => {
+  const invitationsPath = path.join(__dirname, 'invitations.json');
+  const invitations = JSON.parse(fs.readFileSync(invitationsPath));
+  
+  let count = 0;
+  Object.values(invitations).forEach(inv => {
+    pool.query(
+      `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests) VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT DO NOTHING`,
+      [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)],
+      (err) => {
+        if (!err) count++;
+        if (count === Object.values(invitations).length) {
+          res.json({ seeded: count });
+        }
+      }
+    );
+  });
+});
+
 app.listen(3001, () => console.log('Server running on port 3001'));

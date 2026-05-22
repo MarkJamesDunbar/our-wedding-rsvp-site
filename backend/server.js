@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
@@ -38,16 +39,30 @@ db.serialize(() => {
   // Seed invitations
   db.get(`SELECT COUNT(*) as count FROM invitations`, (err, row) => {
     if (row.count === 0) {
-      const invitationsPath = path.join(__dirname, '../wedding-rsvp/src/data/invitations.json');
-      const invitations = JSON.parse(fs.readFileSync(invitationsPath));
-      
-      Object.values(invitations).forEach(inv => {
-        db.run(
-          `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests) VALUES (?, ?, ?, ?, ?)`,
-          [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)]
-        );
-      });
-      console.log('✓ Seeded invitations');
+      const candidatePaths = [
+        path.join(__dirname, 'data/invitations.json'),
+        path.join(__dirname, '../wedding-rsvp/src/data/invitations.json')
+      ];
+      const invitationsPath = candidatePaths.find(filePath => fs.existsSync(filePath));
+
+      if (!invitationsPath) {
+        console.warn('No invitations.json found; skipping seed');
+        return;
+      }
+
+      try {
+        const invitations = JSON.parse(fs.readFileSync(invitationsPath, 'utf8'));
+
+        Object.values(invitations).forEach(inv => {
+          db.run(
+            `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests) VALUES (?, ?, ?, ?, ?)`,
+            [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)]
+          );
+        });
+        console.log('✓ Seeded invitations');
+      } catch (seedErr) {
+        console.error('Failed to seed invitations:', seedErr);
+      }
     }
   });
 });
@@ -180,4 +195,4 @@ app.get('/api/admin/export-csv', (req, res) => {
   );
 });
 
-app.listen(3001, () => console.log('Server running on port 3001'));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,107 +1,86 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-const db = new sqlite3.Database('./wedding.db', (err) => {
-  if (err) console.error(err);
-  else console.log('Connected to SQLite');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
 });
 
 // Create tables
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS invitations (
-      id TEXT PRIMARY KEY,
-      invite_id TEXT,
-      primary_guest TEXT,
-      party_size INTEGER,
-      guests TEXT
-    )
-  `);
-  
-  db.run(`
-    CREATE TABLE IF NOT EXISTS responses (
-      id INTEGER PRIMARY KEY,
-      invitation_id TEXT UNIQUE,
-      response_data TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+pool.query(`
+  CREATE TABLE IF NOT EXISTS invitations (
+    id TEXT PRIMARY KEY,
+    invite_id TEXT,
+    primary_guest TEXT,
+    party_size INTEGER,
+    guests TEXT
+  )
+`);
 
-  // Seed invitations
-  db.get(`SELECT COUNT(*) as count FROM invitations`, (err, row) => {
-    if (row.count === 0) {
-      const candidatePaths = [
-        path.join(__dirname, 'data/invitations.json'),
-        path.join(__dirname, '../wedding-rsvp/src/data/invitations.json')
-      ];
-      const invitationsPath = candidatePaths.find(filePath => fs.existsSync(filePath));
+pool.query(`
+  CREATE TABLE IF NOT EXISTS responses (
+    id SERIAL PRIMARY KEY,
+    invitation_id TEXT UNIQUE,
+    response_data TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )
+`);
 
-      if (!invitationsPath) {
-        console.warn('No invitations.json found; skipping seed');
-        return;
-      }
-
-      try {
-        const invitations = JSON.parse(fs.readFileSync(invitationsPath, 'utf8'));
-
-        Object.values(invitations).forEach(inv => {
-          db.run(
-            `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests) VALUES (?, ?, ?, ?, ?)`,
-            [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)]
-          );
-        });
-        console.log('✓ Seeded invitations');
-      } catch (seedErr) {
-        console.error('Failed to seed invitations:', seedErr);
-      }
-    }
-  });
+// Seed invitations
+pool.query('SELECT COUNT(*) as count FROM invitations', (err, result) => {
+  if (result.rows[0].count === 0) {
+    const invitationsPath = path.join(__dirname, 'invitations.json');
+    const invitations = JSON.parse(fs.readFileSync(invitationsPath));
+    
+    Object.values(invitations).forEach(inv => {
+      pool.query(
+        `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests) VALUES ($1, $2, $3, $4, $5)`,
+        [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)]
+      );
+    });
+    console.log('✓ Seeded invitations');
+  }
 });
 
 // Get invitation
 app.get('/api/invitation/:invitation_id', (req, res) => {
-  db.get(
-    `SELECT * FROM invitations WHERE id = ?`,
-    [req.params.invitation_id],
-    (err, row) => {
-      if (err) res.status(500).json({ error: err.message });
-      else if (row) {
-        res.json({
-          qr_code: row.id,
-          invite_id: row.invite_id,
-          primary_guest: row.primary_guest,
-          party_size: row.party_size,
-          guests: JSON.parse(row.guests),
-          has_responded: false,
-          response: null
-        });
-      } else res.status(404).json({ error: 'Not found' });
-    }
-  );
+  pool.query('SELECT * FROM invitations WHERE id = $1', [req.params.invitation_id], (err, result) => {
+    if (err) res.status(500).json({ error: err.message });
+    else if (result.rows.length > 0) {
+      const row = result.rows[0];
+      res.json({
+        qr_code: row.id,
+        invite_id: row.invite_id,
+        primary_guest: row.primary_guest,
+        party_size: row.party_size,
+        guests: JSON.parse(row.guests),
+        has_responded: false,
+        response: null
+      });
+    } else res.status(404).json({ error: 'Not found' });
+  });
 });
 
 // Save response
 app.post('/api/save-response', (req, res) => {
   const { invitation_id, response_data } = req.body;
-  console.log('Saving:', invitation_id, response_data);
-  db.run(
-    `INSERT OR REPLACE INTO responses (invitation_id, response_data, last_updated) VALUES (?, ?, CURRENT_TIMESTAMP)`,
+  console.log('Saving:', invitation_id);
+  pool.query(
+    `INSERT INTO responses (invitation_id, response_data, last_updated) VALUES ($1, $2, CURRENT_TIMESTAMP)
+     ON CONFLICT (invitation_id) DO UPDATE SET response_data = $2, last_updated = CURRENT_TIMESTAMP`,
     [invitation_id, JSON.stringify(response_data)],
     (err) => {
       if (err) {
         console.error('Save error:', err);
         res.status(500).json({ error: err.message });
-      }
-      else {
+      } else {
         console.log('Saved successfully');
         res.json({ success: true });
       }
@@ -111,28 +90,30 @@ app.post('/api/save-response', (req, res) => {
 
 // Get response
 app.get('/api/get-response/:invitation_id', (req, res) => {
-  db.get(
-    `SELECT response_data, last_updated FROM responses WHERE invitation_id = ?`,
+  pool.query(
+    `SELECT response_data, last_updated FROM responses WHERE invitation_id = $1`,
     [req.params.invitation_id],
-    (err, row) => {
+    (err, result) => {
       if (err) res.status(500).json({ error: err.message });
-      else res.json(row ? { data: JSON.parse(row.response_data), last_updated: row.last_updated } : null);
+      else if (result.rows.length > 0) {
+        const row = result.rows[0];
+        res.json({ data: JSON.parse(row.response_data), last_updated: row.last_updated });
+      } else res.json(null);
     }
   );
 });
 
 // Get all invitations with responses (admin)
 app.get('/api/admin/all-responses', (req, res) => {
-  db.all(
+  pool.query(
     `SELECT i.id, i.primary_guest, i.guests, r.response_data, r.last_updated 
      FROM invitations i 
      LEFT JOIN responses r ON i.id = r.invitation_id 
      ORDER BY i.id ASC`,
-    [],
-    (err, rows) => {
+    (err, result) => {
       if (err) res.status(500).json({ error: err.message });
       else {
-        const formatted = rows.map(row => {
+        const formatted = result.rows.map(row => {
           const guests = JSON.parse(row.guests);
           const responses = row.response_data ? JSON.parse(row.response_data) : null;
           
@@ -159,18 +140,17 @@ app.get('/api/admin/all-responses', (req, res) => {
 
 // Export CSV
 app.get('/api/admin/export-csv', (req, res) => {
-  db.all(
+  pool.query(
     `SELECT i.id, i.primary_guest, i.guests, r.response_data, r.last_updated 
      FROM invitations i 
      LEFT JOIN responses r ON i.id = r.invitation_id 
      ORDER BY i.id ASC`,
-    [],
-    (err, rows) => {
+    (err, result) => {
       if (err) res.status(500).json({ error: err.message });
       else {
         let csv = 'Invitation ID,Primary Guest,Guest Name,Attending,Course 1,Course 2,Course 3,Dietary Restrictions,Last Updated\n';
         
-        rows.forEach(row => {
+        result.rows.forEach(row => {
           const guests = JSON.parse(row.guests);
           const responses = row.response_data ? JSON.parse(row.response_data) : null;
           
@@ -195,4 +175,4 @@ app.get('/api/admin/export-csv', (req, res) => {
   );
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(3001, () => console.log('Server running on port 3001'));

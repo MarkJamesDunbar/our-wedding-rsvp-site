@@ -1,3 +1,13 @@
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection:', reason);
+  process.exit(1);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err);
+  process.exit(1);
+});
+
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
@@ -92,6 +102,7 @@ async function initDatabase() {
     await seedInvitations();
   } catch (err) {
     console.error('❌ Database initialisation failed:', err.message);
+    throw err;
   }
 }
 
@@ -248,4 +259,7 @@ app.get('/api/admin/export-csv', (req, res) => {
   app.listen(3001, () => {
     console.log('✓ Server running on port 3001');
   });
-})();
+})().catch(err => {
+  console.error('❌ Startup failed:', err);
+  process.exit(1);
+});

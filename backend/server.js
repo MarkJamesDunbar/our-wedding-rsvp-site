@@ -1,13 +1,3 @@
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection:', reason);
-  process.exit(1);
-});
-
-process.on('uncaughtException', (err) => {
-  console.error('❌ Uncaught Exception:', err);
-  process.exit(1);
-});
-
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
@@ -46,15 +36,6 @@ pool.on('connect', () => {
   console.log('✓ Connected to PostgreSQL');
 });
 
-function queryAsync(sql, params) {
-  return new Promise((resolve, reject) => {
-    pool.query(sql, params, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
-    });
-  });
-}
-
 // Seed invitations from invitations.json (runs once on startup)
 async function seedInvitations() {
   console.log('🌱 Seeding invitations from invitations.json...');
@@ -67,7 +48,7 @@ async function seedInvitations() {
 
     let seeded = 0;
     for (const inv of entries) {
-      await queryAsync(
+      await pool.query(
         `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests)
          VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
         [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)]
@@ -83,7 +64,7 @@ async function seedInvitations() {
 // Create tables then seed
 async function initDatabase() {
   try {
-    await queryAsync(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS invitations (
         id TEXT PRIMARY KEY,
         invite_id TEXT,
@@ -91,10 +72,10 @@ async function initDatabase() {
         party_size INTEGER,
         guests TEXT
       )
-    `, []);
+    `);
     console.log('✓ Invitations table ready');
 
-    await queryAsync(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS responses (
         id SERIAL PRIMARY KEY,
         invitation_id TEXT UNIQUE,
@@ -102,16 +83,15 @@ async function initDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `, []);
+    `);
     console.log('✓ Responses table ready');
 
-    await queryAsync('SELECT NOW()', []);
+    await pool.query('SELECT NOW()');
     console.log('✓ Database connection working');
 
     await seedInvitations();
   } catch (err) {
     console.error('❌ Database initialisation failed:', err.message);
-    throw err;
   }
 }
 
@@ -263,12 +243,12 @@ app.get('/api/admin/export-csv', (req, res) => {
   );
 });
 
-(async () => {
-  await initDatabase();
+// Start server after database is ready
+initDatabase().then(() => {
   app.listen(3001, () => {
     console.log('✓ Server running on port 3001');
   });
-})().catch(err => {
-  console.error('❌ Startup failed:', err);
+}).catch(err => {
+  console.error('❌ Failed to initialize database:', err);
   process.exit(1);
 });

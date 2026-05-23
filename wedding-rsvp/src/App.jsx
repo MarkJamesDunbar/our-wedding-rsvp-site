@@ -66,8 +66,11 @@ function AppContent() {
       
       {invitation && (
         <>
+          <Route path="/" element={<HomePage invitation={invitation} />} />
           <Route path="/invite" element={<HomePage invitation={invitation} />} />
+          <Route path="/rsvp" element={<RSVPForm invitation={invitation} courses={courses} onSubmit={handleRsvpSubmit} />} />
           <Route path="/invite/rsvp" element={<RSVPForm invitation={invitation} courses={courses} onSubmit={handleRsvpSubmit} />} />
+          <Route path="/confirmation" element={<ConfirmationPage />} />
           <Route path="/invite/confirmation" element={<ConfirmationPage />} />
         </>
       )}

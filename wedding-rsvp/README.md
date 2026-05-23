@@ -1,16 +1,34 @@
-# React + Vite
+# Wedding RSVP Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for the wedding RSVP flow.
 
-Currently, two official plugins are available:
+## Environment
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Copy `.env.example` to `.env` and set:
 
-## React Compiler
+- `VITE_API_BASE_URL`: Full backend URL (for example `https://your-backend-domain.up.railway.app`)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+For local development, you can leave it empty and proxy API requests from the Vite dev server.
 
-## Expanding the ESLint configuration
+## Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm ci
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Deploy (Vercel)
+
+1. Import this `wedding-rsvp` folder as a Vercel project.
+2. Set environment variable `VITE_API_BASE_URL` to your Railway backend URL.
+3. Build command: `npm run build`
+4. Output directory: `dist`
+
+The included `vercel.json` already rewrites all routes to `index.html` for client-side routing.

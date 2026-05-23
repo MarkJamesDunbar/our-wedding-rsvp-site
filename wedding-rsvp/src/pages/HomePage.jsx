@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function HomePage({ invitation }) {
   const navigate = useNavigate();
-  const [expandedGuest, setExpandedGuest] = useState(null);
   const hasRsvpd = invitation.has_responded;
   const weddingDate = new Date("2024-12-31");
   const daysUntil = Math.ceil((weddingDate - new Date()) / (1000 * 60 * 60 * 24));

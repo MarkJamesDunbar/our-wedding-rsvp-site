@@ -1,17 +1,14 @@
 import { useState, useEffect } from 'react';
+import { apiPath } from '../config/api';
 
 export default function AdminPortal() {
   const [responses, setResponses] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAllResponses();
-  }, []);
-
-  const fetchAllResponses = () => {
+  function fetchAllResponses() {
     setLoading(true);
-    fetch('https://our-wedding-rsvp-site-production.up.railway.app/api/admin/all-responses')
+    fetch(apiPath('/api/admin/all-responses'))
       .then(res => res.json())
       .then(data => {
         setResponses(data.responses || []);
@@ -22,10 +19,24 @@ export default function AdminPortal() {
         console.error(err);
         setLoading(false);
       });
-  };
+  }
+
+  useEffect(() => {
+    fetch(apiPath('/api/admin/all-responses'))
+      .then(res => res.json())
+      .then(data => {
+        setResponses(data.responses || []);
+        setLastUpdated(new Date().toLocaleString());
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
 
   const downloadCSV = () => {
-    window.location.href = 'https://our-wedding-rsvp-site-production.up.railway.app/api/admin/export-csv';
+    window.location.href = apiPath('/api/admin/export-csv');
   };
 
   if (loading) return <div style={{ padding: '20px' }}>Loading...</div>;

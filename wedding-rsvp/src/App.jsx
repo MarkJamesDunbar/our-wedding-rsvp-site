@@ -5,27 +5,27 @@ import RSVPForm from './pages/RSVPForm';
 import ConfirmationPage from './pages/ConfirmationPage';
 import AdminPortal from './pages/AdminPortal';
 import { courses } from './data/mockData';
+import { apiPath } from './config/api';
 
 function AppContent() {
   const [searchParams] = useSearchParams();
   const invitationId = searchParams.get('id');
   const [invitation, setInvitation] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(invitationId));
 
   useEffect(() => {
     if (!invitationId) {
-      setLoading(false);
       return;
     }
 
-    fetch(`https://our-wedding-rsvp-site-production.up.railway.app/api/invitation/${invitationId}`)
+    fetch(apiPath(`/api/invitation/${invitationId}`))
       .then(res => {
         if (!res.ok) throw new Error('Not found');
         return res.json();
       })
       .then(data => {
         setInvitation(data);
-        return fetch(`https://our-wedding-rsvp-site-production.up.railway.app/api/get-response/${invitationId}`);
+        return fetch(apiPath(`/api/get-response/${invitationId}`));
       })
       .then(res => res.json())
       .then(data => {
@@ -42,7 +42,7 @@ function AppContent() {
   }, [invitationId]);
 
   const handleRsvpSubmit = async (responses) => {
-    await fetch('https://our-wedding-rsvp-site-production.up.railway.app/api/save-response', {
+    await fetch(apiPath('/api/save-response'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ invitation_id: invitationId, response_data: responses })

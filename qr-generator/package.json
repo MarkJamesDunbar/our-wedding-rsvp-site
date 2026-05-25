@@ -1,0 +1,12 @@
+{
+  "name": "wedding-qr-generator",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "generate": "node scripts/generate-qrs.mjs"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}

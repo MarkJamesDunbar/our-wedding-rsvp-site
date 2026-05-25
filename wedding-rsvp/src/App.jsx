@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage';
 import RSVPForm from './pages/RSVPForm';
 import ConfirmationPage from './pages/ConfirmationPage';
 import AdminPortal from './pages/AdminPortal';
-import { courses } from './data/mockData';
+import { courses } from './data/menuOptions';
 import { apiPath } from './config/api';
 
 function AppContent() {

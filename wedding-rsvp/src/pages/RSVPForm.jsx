@@ -5,6 +5,8 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   const navigate = useNavigate();
   const [step, setStep] = useState('attendance');
   const [error, setError] = useState(null);
+  const [attendanceError, setAttendanceError] = useState(null);
+  const [invalidCourseFields, setInvalidCourseFields] = useState({});
   const [responses, setResponses] = useState(
     invitation.guests.map(guest => ({
       name: guest.name,
@@ -18,57 +20,65 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
     const updated = [...responses];
     updated[index].attending = attending;
     setResponses(updated);
+    setAttendanceError(null);
+  };
+
+  const allAttendanceChosen = responses.every((response) => response.attending !== null);
+
+  const handleAttendanceNext = () => {
+    if (!allAttendanceChosen) {
+      setAttendanceError('Please confirm each guest\'s attendance before continuing.');
+      return;
+    }
+
+    const hasAttendingGuest = responses.some((response) => response.attending === true);
+
+    if (!hasAttendingGuest) {
+      onSubmit(responses);
+      navigate(`/invite/confirmation?id=${invitation.qr_code}`);
+      return;
+    }
+
+    setStep('menu');
   };
 
   // Page 1: Attendance
   if (step === 'attendance') {
     return (
-      <div>
-        <h1>Can you attend?</h1>
+      <div className="page rsvp-page rsvp-attendance-page">
+        <h1>RSVP</h1>
         
         {responses.map((response, idx) => (
-          <div key={idx} style={{ marginBottom: '25px', padding: '15px', border: '1px solid #ddd' }}>
+          <div key={idx} className="card guest-card">
             <h3>{response.name}</h3>
             
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="button-row">
               <button
                 onClick={() => handleAttendingChange(idx, true)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  backgroundColor: response.attending === true ? '#4caf50' : '#f0f0f0',
-                  color: response.attending === true ? 'white' : 'black',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: 'bold'
-                }}
+                aria-pressed={response.attending === true}
+                className={`can-attend ${response.attending === true ? 'btn-success' : 'btn-ghost'}`}
               >
-                ✓ Can attend
+                Delightfully Accept
               </button>
               
               <button
                 onClick={() => handleAttendingChange(idx, false)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  backgroundColor: response.attending === false ? '#f44336' : '#f0f0f0',
-                  color: response.attending === false ? 'white' : 'black',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: 'bold'
-                }}
+                aria-pressed={response.attending === false}
+                className={`cannot-attend ${response.attending === false ? 'btn-danger' : 'btn-ghost'}`}
               >
-                ✗ Cannot attend
+                Regretfully Decline
               </button>
             </div>
           </div>
         ))}
 
-        <button onClick={() => setStep('menu')}>Next</button>
+        {attendanceError && (
+          <div className="error-banner">{attendanceError}</div>
+        )}
+
+        <div className="button-row button-row-right">
+          <button className="next-button" onClick={handleAttendanceNext}>Next</button>
+        </div>
       </div>
     );
   }
@@ -76,25 +86,16 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   // Page 2: Menu selection (only for attending guests)
   const attendingGuests = responses.filter(r => r.attending === true);
 
-  if (attendingGuests.length === 0) {
-    return (
-      <div>
-        <h1>Thanks for letting us know!</h1>
-        <button onClick={() => {
-          onSubmit(responses);
-          navigate(`/invite/confirmation?id=${invitation.qr_code}`);
-        }}>
-          Submit
-        </button>
-      </div>
-    );
-  }
-
   const handleCourseChange = (guestName, courseId, value) => {
     const updated = [...responses];
     const guestIdx = updated.findIndex(r => r.name === guestName);
     updated[guestIdx].courses[courseId] = value;
     setResponses(updated);
+    setInvalidCourseFields((current) => {
+      const next = { ...current };
+      delete next[`${guestName}:${courseId}`];
+      return next;
+    });
   };
 
   const handleDietaryChange = (guestName, value) => {
@@ -105,39 +106,44 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   };
 
   const handleSubmit = () => {
-    // Validate all attending guests have all courses selected
-    const isValid = attendingGuests.every(guest => 
-      guest.courses.course_1 && guest.courses.course_2 && guest.courses.course_3
-    );
+    const missingFields = {};
+
+    attendingGuests.forEach((guest) => {
+      courses.forEach((course) => {
+        if (!guest.courses[course.id]) {
+          missingFields[`${guest.name}:${course.id}`] = true;
+        }
+      });
+    });
+
+    const isValid = Object.keys(missingFields).length === 0;
 
     if (!isValid) {
-      setError('*You must choose an option for each course');
+      setInvalidCourseFields(missingFields);
+      setError('Please choose an option for each course.');
       return;
     }
 
+    setInvalidCourseFields({});
     onSubmit(responses);
     navigate(`/invite/confirmation?id=${invitation.qr_code}`);
   };
 
   return (
-    <div>
-      <h1>Menu selections</h1>
-      
-      {error && (
-        <div style={{ color: '#f44336', marginBottom: '20px', fontWeight: 'bold' }}>
-          {error}
-        </div>
-      )}
+    <div className="page rsvp-page rsvp-menu-page">
+      <h1>Menu Selections</h1>
       
       {attendingGuests.map((guest) => (
-        <div key={guest.name} style={{ marginBottom: '30px', border: '1px solid #ddd', padding: '20px' }}>
-          <h2>{guest.name}</h2>
+        <div key={guest.name} className="card guest-card">
+          <h2 className="guest-name">{guest.name}</h2>
           
           {courses.map(course => (
-            <div key={course.id} style={{ marginBottom: '15px' }}>
-              <label>{course.label}:</label>
+            <div key={course.id} className="form-field">
+              <label>{course.label}</label>
               <select 
+                className={invalidCourseFields[`${guest.name}:${course.id}`] ? 'field-error' : ''}
                 value={guest.courses[course.id] || ''}
+                aria-invalid={invalidCourseFields[`${guest.name}:${course.id}`] ? 'true' : 'false'}
                 onChange={(e) => {
                   handleCourseChange(guest.name, course.id, e.target.value);
                   setError(null);
@@ -151,22 +157,26 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
             </div>
           ))}
 
-          <div>
-            <label>Dietary restrictions:</label>
+          <div className="form-field">
+            <label>Dietary restrictions</label>
             <textarea 
               placeholder="Any dietary needs?" 
               value={guest.dietary}
               onChange={(e) => handleDietaryChange(guest.name, e.target.value)}
-              style={{ width: '100%', minHeight: '80px' }}
             />
           </div>
         </div>
       ))}
 
-      <button onClick={() => setStep('attendance')}>Back</button>
-      <button onClick={handleSubmit} style={{ marginLeft: '10px' }}>
-        Submit
-      </button>
+      {error && (
+        <div className="error-banner">
+          {error}
+        </div>
+      )}
+
+      <div className="button-row button-row-right">
+        <button className="next-button" onClick={handleSubmit}>Submit</button>
+      </div>
     </div>
   );
 }

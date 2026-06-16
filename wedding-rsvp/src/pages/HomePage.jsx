@@ -5,49 +5,41 @@ export default function HomePage({ invitation }) {
   const navigate = useNavigate();
   const hasRsvpd = invitation.has_responded;
   const weddingDate = new Date(weddingDetails.weddingDateIso);
-  const daysUntil = Math.max(
-    0,
-    Math.ceil((weddingDate - new Date()) / (1000 * 60 * 60 * 24))
-  );
+
+  function ordinalDay(day) {
+    const suffixes = ['th', 'st', 'nd', 'rd'];
+    const value = day % 100;
+    return `${day}${suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0]}`;
+  }
+
+  const displayDate = `${weddingDate.toLocaleDateString(undefined, { month: 'long' })} ${ordinalDay(weddingDate.getDate())} ${weddingDate.getFullYear()}`;
+  const coupleNames = weddingDetails.coupleNames;
+  const [firstName, secondName] = coupleNames.split(' & ');
+  const locationLabel = 'Isle of Bute, Scotland';
 
   return (
-    <div className="page">
-      <p className="eyebrow">{weddingDetails.coupleNames}</p>
-      {hasRsvpd ? (
-        <>
-          <h1>✓ You're going!</h1>
-          <p className="lead">Wedding in {daysUntil} days</p>
+    <div className="page landing-page">
+      <section className="invite-sheet" aria-label="Wedding invitation hero">
+        <span className="corner corner-top-left" aria-hidden="true" />
+        <span className="corner corner-top-right" aria-hidden="true" />
+        <span className="corner corner-bottom-left" aria-hidden="true" />
+        <span className="corner corner-bottom-right" aria-hidden="true" />
 
-          {invitation.response && (
-        <div className="card" style={{ marginBottom: '20px' }}>
-            <h3>Your Response:</h3>
-            {invitation.response.map((guest, idx) => (
-            <div key={idx}>
-                <p><strong>✓ {guest.name}</strong></p>
-            </div>
-            ))}
+        <div className="invite-center">
+          <p className="invite-lead">Join us for the Wedding of</p>
+          <h1>{firstName} & {secondName}</h1>
+          <p className="invite-date">{displayDate}</p>
+          <p className="invite-place">{locationLabel}</p>
         </div>
-)}
 
-          <button onClick={() => navigate(`/invite/rsvp?id=${invitation.qr_code}`)}>Edit Your Choices</button>
-        </>
-      ) : (
-        <button onClick={() => navigate(`/invite/rsvp?id=${invitation.qr_code}`)}>RSVP Now</button>
-      )}
+        <button
+          className="rsvp-outline invite-rsvp-button"
+          onClick={() => navigate(`/invite/rsvp?id=${invitation.qr_code}`)}
+        >
+            {hasRsvpd ? 'UPDATE RSVP' : 'RSVP'}
+        </button>
+      </section>
 
-      <hr />
-
-      <h2>About the Wedding</h2>
-
-      <div className="card info-block">
-        <p><strong>Date:</strong> {weddingDate.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-        <p><strong>Venue:</strong> {weddingDetails.venue.name}</p>
-        <p><strong>Location:</strong> {weddingDetails.venue.address}</p>
-        {weddingDetails.schedule.map((item) => (
-          <p key={item}>{item}</p>
-        ))}
-        <p>{weddingDetails.note}</p>
-      </div>
     </div>
   );
 }

@@ -9,15 +9,26 @@ export default function ConfirmationPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate(`/invite?id=${invitationId}`);
-    }, 3000);
+    }, 4500);
 
     return () => clearTimeout(timer);
   }, [navigate, invitationId]);
 
   return (
-    <div>
-      <h1>✓ Thank you!</h1>
-      <p>We've got your RSVP. Redirecting...</p>
+    <div className="page page-center confirmation-page">
+      <div className="card confirmation-card">
+        <div className="confirmation-status" role="status" aria-live="polite">
+          <span className="confirmation-check" aria-hidden="true">✓</span>
+          <h1>We’ve received your RSVP</h1>
+          <p className="confirmation-message">Thanks for replying. We’re processing and saving your response now.</p>
+        </div>
+
+        <div className="confirmation-loading" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+      </div>
     </div>
   );
 }

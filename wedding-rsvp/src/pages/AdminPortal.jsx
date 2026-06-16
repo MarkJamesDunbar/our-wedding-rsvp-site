@@ -9,13 +9,13 @@ export default function AdminPortal() {
   function fetchAllResponses() {
     setLoading(true);
     fetch(apiPath('/api/admin/all-responses'))
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setResponses(data.responses || []);
         setLastUpdated(new Date().toLocaleString());
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         setLoading(false);
       });
@@ -23,13 +23,13 @@ export default function AdminPortal() {
 
   useEffect(() => {
     fetch(apiPath('/api/admin/all-responses'))
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setResponses(data.responses || []);
         setLastUpdated(new Date().toLocaleString());
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         setLoading(false);
       });
@@ -39,88 +39,80 @@ export default function AdminPortal() {
     window.location.href = apiPath('/api/admin/export-csv');
   };
 
-  if (loading) return <div style={{ padding: '20px' }}>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="page page-center">
+        <div className="card status-card">
+          <p className="eyebrow">Admin</p>
+          <h1>Loading responses</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ marginBottom: '12px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <button
-          onClick={fetchAllResponses}
-          style={{ padding: '8px 12px', fontSize: '16px', cursor: 'pointer', border: '1px solid #ddd', backgroundColor: 'white', borderRadius: '4px' }}
-          title="Refresh"
-        >
-          🔄
+    <div className="page">
+      <div className="admin-header">
+        <p className="eyebrow">Admin portal</p>
+        <h1>Guest responses</h1>
+      </div>
+
+      <div className="button-row">
+        <button onClick={fetchAllResponses} className="btn-ghost" title="Refresh">
+          Refresh
         </button>
 
-        <button
-          onClick={downloadCSV}
-          style={{ padding: '8px 16px', backgroundColor: '#4caf50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-        >
+        <button onClick={downloadCSV} className="btn-sage">
           Download CSV
         </button>
       </div>
 
-      {lastUpdated && (
-        <div style={{ marginBottom: '12px', fontSize: '12px', color: '#666', textAlign: 'center' }}>
-          Last refreshed: {lastUpdated}
-        </div>
-      )}
+      {lastUpdated && <div className="caption">Last refreshed: {lastUpdated}</div>}
 
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ 
-          width: '100%', 
-          borderCollapse: 'collapse',
-          fontSize: '13px',
-          minWidth: '900px'
-        }}>
+      <div className="table-wrap card">
+        <table className="admin-table">
           <thead>
-            <tr style={{ backgroundColor: '#f0f0f0' }}>
-              <th style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'left', minWidth: '80px' }}>Invitation</th>
-              <th style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'left', minWidth: '120px' }}>Guest Name</th>
-              <th style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center', minWidth: '100px' }}>Attending</th>
-              <th style={{ border: '1px solid #ddd', padding: '10px', minWidth: '100px' }}>Course 1</th>
-              <th style={{ border: '1px solid #ddd', padding: '10px', minWidth: '100px' }}>Course 2</th>
-              <th style={{ border: '1px solid #ddd', padding: '10px', minWidth: '100px' }}>Course 3</th>
-              <th style={{ border: '1px solid #ddd', padding: '10px', minWidth: '120px' }}>Dietary</th>
+            <tr>
+              <th>Invitation</th>
+              <th>Guest Name</th>
+              <th>Attending</th>
+              <th>Course 1</th>
+              <th>Course 2</th>
+              <th>Course 3</th>
+              <th>Dietary</th>
             </tr>
           </thead>
           <tbody>
             {responses.length === 0 ? (
               <tr>
-                <td colSpan="7" style={{ border: '1px solid #ddd', padding: '20px', textAlign: 'center' }}>
+                <td colSpan="7" className="empty-row">
                   No guests
                 </td>
               </tr>
             ) : (
               responses.map((resp, idx) => {
-                let rowColor = 'white';
-                if (resp.attended === 'Yes') rowColor = '#d4edda';
-                else if (resp.attended === 'Not yet responded') rowColor = '#e9ecef';
-                
+                let rowClass = '';
+                if (resp.attended === 'Yes') rowClass = 'row-attending';
+                else if (resp.attended === 'Not yet responded') rowClass = 'row-pending';
+
                 return (
-                  <tr key={idx} style={{ backgroundColor: rowColor }}>
-                    <td style={{ border: '1px solid #ddd', padding: '10px', fontSize: '12px' }}>{resp.invitation_id}</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>{resp.name}</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
-                      <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                        {resp.attended === 'Yes' ? '✓' : resp.attended === 'No' ? '✗' : '—'}
+                  <tr key={idx} className={rowClass}>
+                    <td>{resp.invitation_id}</td>
+                    <td>{resp.name}</td>
+                    <td>
+                      <div className="attending-mark">
+                        {resp.attended === 'Yes'
+                          ? 'Yes'
+                          : resp.attended === 'No'
+                            ? 'No'
+                            : 'Pending'}
                       </div>
-                      <div style={{ fontSize: '11px', color: '#666' }}>
-                        {resp.last_updated}
-                      </div>
+                      <div className="caption">{resp.last_updated}</div>
                     </td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                      {resp.course_1}
-                    </td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                      {resp.course_2}
-                    </td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                      {resp.course_3}
-                    </td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>
-                      {resp.dietary}
-                    </td>
+                    <td>{resp.course_1}</td>
+                    <td>{resp.course_2}</td>
+                    <td>{resp.course_3}</td>
+                    <td>{resp.dietary}</td>
                   </tr>
                 );
               })

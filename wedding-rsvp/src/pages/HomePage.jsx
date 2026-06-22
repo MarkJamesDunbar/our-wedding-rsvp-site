@@ -1,45 +1,228 @@
-import { useNavigate } from 'react-router-dom';
-import { weddingDetails } from '../data/weddingDetails';
+import { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import arrowDesign from '../assets/designs/arrow.png';
+import dresscodeDesign from '../assets/designs/dresscode.svg';
+import LandingCarousel from '../components/LandingCarousel';
+import inviteCardDesign from '../assets/designs/invite_card.svg';
+import planeDesign from '../assets/designs/plane.svg';
+import rsvpPageDesign from '../assets/designs/rsvp-page.svg';
+import timelineDesign from '../assets/designs/timeline-2.svg';
 
-export default function HomePage({ invitation }) {
-  const navigate = useNavigate();
-  const hasRsvpd = invitation.has_responded;
-  const weddingDate = new Date(weddingDetails.weddingDateIso);
+export default function HomePage() {
+  const location = useLocation();
 
-  function ordinalDay(day) {
-    const suffixes = ['th', 'st', 'nd', 'rd'];
-    const value = day % 100;
-    return `${day}${suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0]}`;
-  }
+  useEffect(() => {
+    document.documentElement.classList.add('homepage-snap');
+    document.body.classList.add('homepage-snap');
 
-  const displayDate = `${weddingDate.toLocaleDateString(undefined, { month: 'long' })} ${ordinalDay(weddingDate.getDate())} ${weddingDate.getFullYear()}`;
-  const coupleNames = weddingDetails.coupleNames;
-  const [firstName, secondName] = coupleNames.split(' & ');
-  const locationLabel = 'Isle of Bute, Scotland';
+    return () => {
+      document.documentElement.classList.remove('homepage-snap');
+      document.body.classList.remove('homepage-snap');
+    };
+  }, []);
+
+  const rsvpPath = location.pathname.startsWith('/invite') ? '/invite/rsvp' : '/rsvp';
+  const rsvpHref = `${rsvpPath}${location.search}`;
 
   return (
     <div className="page landing-page">
-      <section className="invite-sheet" aria-label="Wedding invitation hero">
-        <span className="corner corner-top-left" aria-hidden="true" />
-        <span className="corner corner-top-right" aria-hidden="true" />
-        <span className="corner corner-bottom-left" aria-hidden="true" />
-        <span className="corner corner-bottom-right" aria-hidden="true" />
-
-        <div className="invite-center">
-          <p className="invite-lead">Join us for the Wedding of</p>
-          <h1>{firstName} & {secondName}</h1>
-          <p className="invite-date">{displayDate}</p>
-          <p className="invite-place">{locationLabel}</p>
+      <section className="landing-hero" aria-label="Wedding invitation hero">
+        <div className="landing-card-wrap">
+          <img
+            className="landing-invite-card"
+            src={inviteCardDesign}
+            alt="Wedding invitation for Alyza and Mark"
+          />
         </div>
 
-        <button
-          className="rsvp-outline invite-rsvp-button"
-          onClick={() => navigate(`/invite/rsvp?id=${invitation.qr_code}`)}
-        >
-            {hasRsvpd ? 'UPDATE RSVP' : 'RSVP'}
-        </button>
+        <div className="landing-scroll-cue" aria-hidden="true">
+          <div className="landing-scroll-inner">
+            <p className="landing-scroll-copy">
+              <span>Scroll to</span>
+              <span>rsvp &amp; more</span>
+            </p>
+            <img className="landing-scroll-arrow" src={arrowDesign} alt="" />
+          </div>
+        </div>
       </section>
 
+      <LandingCarousel />
+
+      <section className="landing-third-panel" aria-label="Wedding timeline section">
+        <h2 className="landing-timeline-title">
+          <span className="landing-timeline-line landing-timeline-line-top">Order of</span>
+          <span className="landing-timeline-line landing-timeline-line-bottom">The Day</span>
+        </h2>
+
+        <div className="landing-timeline-art">
+          <img
+            className="landing-timeline-artwork"
+            src={timelineDesign}
+            alt="Wedding timeline details"
+          />
+        </div>
+      </section>
+
+      <section className="landing-fourth-panel" aria-label="Travel information section">
+        <h2 className="landing-travel-title">
+          <span className="landing-travel-line">getting here...</span>
+        </h2>
+
+        <div className="landing-travel-copy">
+          <section className="landing-travel-stop">
+            <h3 className="landing-travel-stop-title">The Venue</h3>
+            <p className="landing-travel-stop-body">
+              Our venue is the fabulous{' '}
+              <a
+                className="landing-travel-link"
+                href="https://www.mountstuart.com/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Mount Stuart
+              </a>{' '}
+              on the Isle of Bute, Scotland. To reach us, you will need to take the
+              ferry from Wemyss Bay to Rothesay. The ferry takes both cars and
+              pedestrians, and takes about 35 minutes.
+            </p>
+          </section>
+
+          <section className="landing-travel-stop">
+            <h3 className="landing-travel-stop-title">Wemyss Bay</h3>
+            <p className="landing-travel-stop-body">
+              <a
+                className="landing-travel-link"
+                href="https://maps.app.goo.gl/N1qCWeZzyuKYjGjv8"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Wemyss Bay
+              </a>{' '}
+              is approximately 45 minutes from Glasgow by car. By train, direct
+              services run from Glasgow Central straight to{' '}
+              <a
+                className="landing-travel-link"
+                href="https://maps.app.goo.gl/N1qCWeZzyuKYjGjv8"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Wemyss Bay station
+              </a>
+              , which is directly connected to the ferry terminal.
+            </p>
+          </section>
+
+          <section className="landing-travel-stop">
+            <h3 className="landing-travel-stop-title">The Ferry</h3>
+            <p className="landing-travel-stop-body">
+              Please book your crossing in advance via the{' '}
+              <a
+                className="landing-travel-link"
+                href="https://ticketing.calmac.co.uk/B2C-Calmac/#/auth/welcoming"
+                target="_blank"
+                rel="noreferrer"
+              >
+                CalMac website
+              </a>{' '}
+              - summer sailings fill quickly. See below for timetables and tickets.
+            </p>
+          </section>
+
+          <section className="landing-travel-stop">
+            <h3 className="landing-travel-stop-title">Rothesay to Mount Stuart</h3>
+            <p className="landing-travel-stop-body">
+              Mount Stuart is 5 miles south of Rothesay. Taxis are available but we
+              recommend{' '}
+              <a
+                className="landing-travel-link"
+                href="https://www.thomsonlocal.com/search/taxis/isle-of-bute"
+                target="_blank"
+                rel="noreferrer"
+              >
+                pre-booking
+              </a>
+              .
+            </p>
+          </section>
+        </div>
+      </section>
+
+      <section className="landing-fifth-panel" aria-label="International guests information section">
+        <img className="landing-international-plane" src={planeDesign} alt="" aria-hidden="true" />
+        <h2 className="landing-international-title">
+          <span className="landing-international-line landing-international-line-top">
+            for international
+          </span>
+          <span className="landing-international-line landing-international-line-bottom">
+            guests
+          </span>
+        </h2>
+      </section>
+
+      <section className="landing-sixth-panel" aria-label="Accommodation section">
+        <h2 className="landing-accommodation-title">
+          <span className="landing-accommodation-line">Accommodation</span>
+        </h2>
+      </section>
+
+      <section className="landing-seventh-panel" aria-label="Dress code section">
+        <div className="landing-dresscode-content">
+          <img
+            className="landing-dresscode-artwork"
+            src={dresscodeDesign}
+            alt="Dress code illustration of heels and formal shoes"
+          />
+
+          <h2 className="landing-dresscode-title">dresscode</h2>
+
+          <p className="landing-dresscode-body">We would love for our guests to dress to impress!</p>
+
+          <p className="landing-dresscode-emphasis">Formal attire</p>
+
+          <p className="landing-dresscode-body">
+            We kindly ask that guests avoid wearing burgundy or deep red tones, as these are
+            reserved for our bridal party.
+          </p>
+
+          <div className="landing-dresscode-swatches" aria-hidden="true">
+            <span className="landing-dresscode-swatch landing-dresscode-swatch-deep" />
+            <span className="landing-dresscode-swatch landing-dresscode-swatch-rich" />
+            <span className="landing-dresscode-swatch landing-dresscode-swatch-bright" />
+            <span className="landing-dresscode-swatch landing-dresscode-swatch-muted" />
+          </div>
+
+          <p className="landing-dresscode-body landing-dresscode-body-last">
+            Filipiniana, Barong and Kilts are also warmly welcomed
+          </p>
+        </div>
+      </section>
+
+      <section className="landing-eighth-panel" aria-label="Useful things to know section">
+        <h2 className="landing-centered-title">
+          <span className="landing-centered-title-line">useful things</span>
+          <span className="landing-centered-title-line landing-centered-title-line-bottom">
+            to know
+          </span>
+        </h2>
+      </section>
+
+      <section className="landing-accent-panel" aria-label="RSVP reminder section">
+        <img className="landing-accent-artwork" src={rsvpPageDesign} alt="RSVP reminder details" />
+
+        <div className="landing-accent-content">
+          <p className="landing-accent-copy">
+            <span>26 June 2027</span>
+            <span>Mount Stuart</span>
+            <span>Isle of Bute</span>
+          </p>
+
+          <Link className="landing-accent-button" to={rsvpHref}>
+            <span className="landing-accent-button-label">rsvp</span>
+          </Link>
+
+          <p className="landing-accent-deadline">rsvp by 31 Aug 2026</p>
+        </div>
+      </section>
     </div>
   );
 }

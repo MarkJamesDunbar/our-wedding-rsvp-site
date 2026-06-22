@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useSearchParams } from 'react-router-dom';
+import ClickSpark from './components/ClickSpark';
 import HomePage from './pages/HomePage';
 import RSVPForm from './pages/RSVPForm';
 import ConfirmationPage from './pages/ConfirmationPage';
@@ -162,7 +163,9 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <ClickSpark sparkColor="#8e1f1d" sparkSize={12} sparkRadius={18} sparkCount={9}>
+        <AppContent />
+      </ClickSpark>
     </BrowserRouter>
   );
 }

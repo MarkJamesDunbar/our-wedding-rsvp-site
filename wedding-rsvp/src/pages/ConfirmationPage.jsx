@@ -19,8 +19,8 @@ export default function ConfirmationPage() {
       <div className="card confirmation-card">
         <div className="confirmation-status" role="status" aria-live="polite">
           <span className="confirmation-check" aria-hidden="true">✓</span>
-          <h1>We’ve received your RSVP</h1>
-          <p className="confirmation-message">Thanks for replying. We’re processing and saving your response now.</p>
+          <h1>You're all set!</h1>
+          <p className="confirmation-message">Thanks for RSVPing. We’re updating your response now.</p>
         </div>
 
         <div className="confirmation-loading" aria-hidden="true">

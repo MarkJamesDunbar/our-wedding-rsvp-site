@@ -14,6 +14,36 @@
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-script: 'Beth Ellen', 'Cormorant Garamond', cursive;
   --font-recoleta: 'Recoleta', 'Cormorant Garamond', Georgia, serif;
+  /* Safe-area insets reported by iOS when viewport-fit=cover is set: the Dynamic
+     Island / notch (top) and the home indicator (bottom). */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  /* Every page fills the FULL device height: from the very top of the screen to
+     the very bottom, with the top and bottom safe zones INCLUDED. The page's
+     background bleeds edge-to-edge into those zones, while content is inset with
+     the --safe-* values so it stays in the visible band in the middle. Because
+     each page always covers the whole screen, neighbouring pages can never bleed
+     into view behind Safari's collapsing toolbars. svh is the fallback for
+     engines without large-viewport units. */
+  --app-height: 100svh;
+  --snap-page-height: 100svh;
+  /* The usable content band between the safe zones (the "100vh" in the middle). */
+  --content-height: calc(100svh - var(--safe-top) - var(--safe-bottom));
+  /* Spacer in the SEAM between two full-screen pages. It sits off-screen while a
+     page is snapped into view (scroll-snap-align: start snaps to each section's
+     top edge), so the safe-area overflow of one page can never overlap the next.
+     ~200px gives a clear break between pages; tune to taste. */
+  --page-gap: 200px;
+}
+
+@supports (height: 100lvh) {
+  :root {
+    --app-height: 100lvh;
+    --snap-page-height: 100lvh;
+    --content-height: calc(100lvh - var(--safe-top) - var(--safe-bottom));
+  }
 }
 
 *,
@@ -36,7 +66,15 @@ body.homepage-snap {
 }
 
 body {
-  overflow-x: hidden;
+  /*
+   * Use `clip`, NOT `hidden`. `overflow-x: hidden` forces `overflow-y` to
+   * compute to `auto`, which makes <body> the scroll container instead of the
+   * document. On iOS Safari that stops the address bar from collapsing on
+   * scroll, so `viewport-fit=cover` never engages and env(safe-area-inset-*)
+   * stays 0. `clip` clips the same horizontal overflow but keeps the document
+   * as the root scroller, letting the dynamic toolbar + safe areas work.
+   */
+  overflow-x: clip;
   background: var(--page-bg);
   color: var(--text);
   font-family: var(--font-sans);
@@ -125,13 +163,17 @@ h3 {
 
 .app-shell,
 .app-content {
-  min-height: 100svh;
+  min-height: var(--app-height);
   width: 100%;
+}
+
+.app-shell {
+  background: var(--page-bg);
 }
 
 .click-spark {
   position: relative;
-  min-height: 100svh;
+  min-height: var(--app-height);
   width: 100%;
 }
 
@@ -178,10 +220,11 @@ h3 {
 }
 
 .page-center {
-  min-height: 100svh;
+  min-height: var(--app-height);
   display: grid;
   place-items: center;
-  padding: 32px 20px;
+  padding: calc(32px + var(--safe-top)) calc(20px + var(--safe-right))
+    calc(32px + var(--safe-bottom)) calc(20px + var(--safe-left));
 }
 
 .card {
@@ -220,14 +263,25 @@ h3 {
 }
 
 .landing-page > section {
+  /* 110 (not 100) so each page reliably covers the whole screen on iOS even
+     while Safari's toolbar is mid-collapse; the extra 10% sits below the fold
+     as overscroll buffer. svh line is the fallback for engines without lvh. */
+  height: 110svh;
+  height: 110lvh;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 
+/* Gap between consecutive pages. `scroll-snap-align: start` keeps snapping to
+   each section's top edge, so this margin lives entirely in the seam and is
+   never visible at rest — it just stops adjacent pages from overlapping. */
+.landing-page > section:not(:last-child) {
+  margin-bottom: var(--page-gap);
+}
+
 .landing-hero {
   position: relative;
-  min-height: 100svh;
-  padding: 0 20px 0;
+  padding: 0 calc(20px + var(--safe-right)) 0 calc(20px + var(--safe-left));
   overflow: hidden;
   isolation: isolate;
 }
@@ -235,7 +289,11 @@ h3 {
 .landing-hero::before {
   content: '';
   position: absolute;
-  inset: 0;
+  /* Bleed the photo out past every edge into the safe zones. When iOS reports
+     real insets (viewport-fit=cover engaged) the photo extends under the notch
+     and home bar; when it reports 0 the negatives collapse to inset:0. */
+  inset: calc(-1 * var(--safe-top)) calc(-1 * var(--safe-right))
+    calc(-1 * var(--safe-bottom)) calc(-1 * var(--safe-left));
   z-index: -2;
   background: url('./assets/engagement_images/markdunbar-2-bw.png') center center / cover no-repeat;
   transform: scale(1.2);
@@ -244,9 +302,22 @@ h3 {
 .landing-hero::after {
   content: '';
   position: absolute;
-  inset: 0;
+  /* Extend past the top/bottom edges so the cream fade reaches into the safe
+     zones that Safari paints with the page background colour. */
+  inset: calc(-1 * var(--safe-top)) 0 calc(-1 * var(--safe-bottom));
   z-index: -1;
-  background: rgba(255, 255, 255, 0.22);
+  /* Soft cream vignette top + bottom so the photo melts seamlessly into the
+     cream that fills the status-bar and home-indicator areas. No hard band,
+     whether or not iOS exposes the safe-area insets. */
+  background:
+    linear-gradient(
+      to bottom,
+      var(--page-bg) 0,
+      rgba(247, 235, 219, 0) calc(var(--safe-top) + 72px),
+      rgba(247, 235, 219, 0) calc(100% - var(--safe-bottom) - 120px),
+      var(--page-bg) 100%
+    ),
+    rgba(255, 255, 255, 0.2);
 }
 
 .landing-card-wrap {
@@ -254,8 +325,8 @@ h3 {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: calc(100svh - 54px);
-  padding: 6px 0 0;
+  height: max(0px, calc(var(--snap-page-height) - 54px - var(--safe-bottom)));
+  padding: calc(6px + var(--safe-top)) 0 0;
   overflow: visible;
 }
 
@@ -276,11 +347,13 @@ h3 {
   display: flex;
   justify-content: center;
   width: 100%;
-  height: 85px;
+  height: calc(85px + var(--safe-bottom));
   margin: 0;
-  padding: 0px;
+  padding: 0 0 var(--safe-bottom);
   color: var(--red);
-  background: rgba(247, 235, 219, 0.82);
+  /* The cream fade now lives in .landing-hero::after, so the cue itself stays
+     transparent and the photo shows through instead of a hard cream band. */
+  background: transparent;
 }
 
 .landing-scroll-inner {
@@ -314,18 +387,17 @@ h3 {
 
 .landing-carousel-panel {
   position: relative;
-  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: var(--safe-top) 0 var(--safe-bottom);
   background: var(--page-bg);
   overflow: hidden;
 }
 
 .landing-carousel-title {
   position: absolute;
-  top: 100px;
+  top: calc(100px + var(--safe-top));
   left: 50%;
   z-index: 1;
   margin: 0;
@@ -342,7 +414,7 @@ h3 {
 .landing-carousel-copy {
   position: absolute;
   left: 50%;
-  bottom: 72px;
+  bottom: calc(72px + var(--safe-bottom));
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -431,18 +503,17 @@ h3 {
 
 .landing-third-panel {
   position: relative;
-  min-height: 100svh;
   background: var(--page-bg);
   overflow: hidden;
 }
 
 .landing-fourth-panel {
   position: relative;
-  min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 38px 28px 230px;
+  padding: calc(38px + var(--safe-top)) calc(28px + var(--safe-right))
+    calc(230px + var(--safe-bottom)) calc(28px + var(--safe-left));
   background: var(--page-bg);
   isolation: isolate;
   overflow: hidden;
@@ -450,7 +521,6 @@ h3 {
 
 .landing-fifth-panel {
   position: relative;
-  min-height: 100svh;
   background: var(--page-bg);
   overflow: hidden;
 }
@@ -459,15 +529,31 @@ h3 {
 .landing-seventh-panel,
 .landing-eighth-panel {
   position: relative;
-  min-height: 100svh;
   background: var(--page-bg);
+}
+
+.landing-eighth-panel {
+  /* Panel itself is the regular cream; the blue lives in the gap below it. */
+  background: var(--page-bg);
+}
+
+.landing-eighth-panel::after {
+  /* Solid colour fill for the page-gap seam directly below this panel. */
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--page-gap);
+  background: #e0eae6;
 }
 
 .landing-seventh-panel {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 82px 28px 72px;
+  padding: calc(82px + var(--safe-top)) calc(28px + var(--safe-right))
+    calc(72px + var(--safe-bottom)) calc(28px + var(--safe-left));
 }
 
 .landing-dresscode-content {
@@ -557,7 +643,6 @@ h3 {
 
 .landing-accent-panel {
   position: relative;
-  min-height: 100svh;
   background: #e0eae6;
   overflow: hidden;
 }
@@ -582,7 +667,7 @@ h3 {
   flex-direction: column;
   align-items: center;
   gap: 36px;
-  width: min(calc(100% - 32px), 460px);
+  width: min(calc(100% - 32px - var(--safe-left) - var(--safe-right)), 460px);
   transform: translateX(-50%);
 }
 
@@ -638,8 +723,8 @@ h3 {
 
 .landing-international-plane {
   position: absolute;
-  top: 72px;
-  left: 92px;
+  top: calc(72px + var(--safe-top));
+  left: calc(92px + var(--safe-left));
   z-index: 1;
   width: 124px;
   height: auto;
@@ -648,8 +733,8 @@ h3 {
 .landing-international-title {
   position: relative;
   margin: 0;
-  padding-top: 110px;
-  padding-right: 88px;
+  padding-top: calc(110px + var(--safe-top));
+  padding-right: calc(88px + var(--safe-right));
   color: var(--red);
   font-family: var(--font-script);
   font-weight: 400;
@@ -675,7 +760,7 @@ h3 {
 .landing-accommodation-title {
   position: relative;
   margin: 0;
-  padding-top: 110px;
+  padding-top: calc(110px + var(--safe-top));
   color: var(--red);
   font-family: var(--font-script);
   font-weight: 400;
@@ -692,7 +777,7 @@ h3 {
 .landing-centered-title {
   position: relative;
   margin: 0;
-  padding-top: 110px;
+  padding-top: calc(110px + var(--safe-top));
   color: var(--red);
   font-family: var(--font-script);
   font-weight: 400;
@@ -718,7 +803,7 @@ h3 {
   bottom: 0;
   z-index: 0;
   aspect-ratio: 1190.25 / 1237.957031;
-  background: url('./assets/designs/waverley.svg') center bottom / 100% auto no-repeat;
+  background: url('./assets/designs/waverley.svg') center bottom / 200% auto no-repeat;
   pointer-events: none;
 }
 
@@ -727,7 +812,7 @@ h3 {
   z-index: 1;
   align-self: stretch;
   margin: 0;
-  padding-left: 76px;
+  padding-left: calc(76px + var(--safe-left));
   color: #54535b;
   font-family: var(--font-script);
   font-weight: 400;
@@ -804,30 +889,29 @@ h3 {
 }
 
 .landing-timeline-line-top {
-  top: 38px;
-  left: 76px;
+  top: calc(38px + var(--safe-top));
+  left: calc(76px + var(--safe-left));
   font-size: 2.85rem;
 }
 
 .landing-timeline-line-bottom {
-  top: 100px;
+  top: calc(100px + var(--safe-top));
   left: 50%;
   font-size: 2.85rem;
   transform: translateX(-36%);
 }
 
 .landing-timeline-art {
-  position: absolute;
-  inset: 0;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 168px 28px 0;
+  padding: calc(168px + var(--safe-top)) 28px 0;
 }
 
 .landing-timeline-artwork {
   width: min(100%, 760px);
-  max-height: calc(100svh - 168px);
+  height: 720px;
+  max-height: calc(var(--snap-page-height) - 168px - var(--safe-top));
   object-fit: contain;
   object-position: bottom center;
 }
@@ -835,7 +919,8 @@ h3 {
 .rsvp-page {
   max-width: 800px;
   margin: 0 auto;
-  padding: 36px 20px 48px;
+  padding: calc(36px + var(--safe-top)) calc(20px + var(--safe-right))
+    calc(48px + var(--safe-bottom)) calc(20px + var(--safe-left));
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -1040,7 +1125,7 @@ h3 {
 .admin-header {
   width: min(1100px, calc(100% - 40px));
   margin: 0 auto 14px;
-  padding-top: 36px;
+  padding-top: calc(36px + var(--safe-top));
 }
 
 .table-wrap {
@@ -1134,12 +1219,12 @@ h3 {
   }
 
   .landing-hero {
-    padding: 0 12px 0;
+    padding: 0 calc(12px + var(--safe-right)) 0 calc(12px + var(--safe-left));
   }
 
   .landing-card-wrap {
-    height: calc(100svh - 48px);
-    padding-top: 4px;
+    height: max(0px, calc(var(--snap-page-height) - 48px - var(--safe-bottom)));
+    padding-top: calc(4px + var(--safe-top));
   }
 
   .landing-invite-card {
@@ -1150,8 +1235,9 @@ h3 {
 
   .landing-scroll-cue {
     width: 100%;
+    height: calc(200px + var(--safe-bottom));
     margin: 0;
-    padding: 0px 0 8px;
+    padding: 0 0 max(8px, var(--safe-bottom));
   }
 
   .landing-scroll-copy {
@@ -1161,21 +1247,21 @@ h3 {
 
   .landing-scroll-arrow {
     left: calc(100% - 15px);
-    bottom: -25px;
+    bottom: 90px;
     width: 75px;
   }
 
   .landing-carousel-panel {
-    padding: 0;
+    padding: var(--safe-top) 0 var(--safe-bottom);
   }
 
   .landing-carousel-title {
-    top: 90px;
+    top: calc(40px + var(--safe-top));
     font-size: 2.05rem;
   }
 
   .landing-carousel-copy {
-    bottom: 86px;
+    bottom: calc(180px + var(--safe-bottom));
     width: min(88vw, 360px);
     gap: 30px;
   }
@@ -1187,6 +1273,7 @@ h3 {
   }
 
   .landing-carousel-copy-body {
+    display: none;
     max-width: 30ch;
     font-size: 1.3rem;
     font-weight: 700;
@@ -1195,7 +1282,7 @@ h3 {
 
   .landing-carousel-mask {
     padding: 0;
-    transform: translateY(-50px);
+    transform: translateY(-70px);
   }
 
   .landing-carousel-track {
@@ -1213,13 +1300,13 @@ h3 {
   }
 
   .landing-international-title {
-    padding-top: 118px;
-    padding-right: 24px;
+    padding-top: calc(118px + var(--safe-top));
+    padding-right: calc(24px + var(--safe-right));
   }
 
   .landing-international-plane {
-    top: -90px;
-    left: -20px;
+    top: calc(-90px + var(--safe-top));
+    left: calc(-20px + var(--safe-left));
     width: 80%;
   }
 
@@ -1233,7 +1320,7 @@ h3 {
   }
 
   .landing-accommodation-title {
-    padding-top: 118px;
+    padding-top: calc(118px + var(--safe-top));
   }
 
   .landing-accommodation-line {
@@ -1241,27 +1328,28 @@ h3 {
   }
 
   .landing-seventh-panel {
-    padding: 66px 16px 56px;
+    padding: calc(42px + var(--safe-top)) calc(16px + var(--safe-right))
+      calc(28px + var(--safe-bottom)) calc(16px + var(--safe-left));
   }
 
   .landing-dresscode-content {
-    gap: 20px;
+    gap: 14px;
     width: min(100%, 430px);
   }
 
   .landing-dresscode-artwork {
-    width: min(100%, 220px);
+    width: min(100%, 178px);
   }
 
   .landing-dresscode-title {
     font-size: 2.05rem;
-    margin-bottom: 66px;
+    margin-bottom: 18px;
   }
 
   .landing-dresscode-body {
     max-width: 26ch;
-    font-size: 1.4rem;
-    line-height: 1.16;
+    font-size: 1.3rem;
+    line-height: 1.12;
   }
 
   .landing-dresscode-emphasis {
@@ -1269,16 +1357,16 @@ h3 {
   }
 
   .landing-dresscode-swatches {
-    gap: 36px;
-    margin: 56px 0 56px;
+    gap: 22px;
+    margin: 20px 0 20px;
   }
 
   .landing-dresscode-swatch {
-    width: 44px;
+    width: 38px;
   }
 
   .landing-centered-title {
-    padding-top: 118px;
+    padding-top: calc(118px + var(--safe-top));
   }
 
   .landing-centered-title-line {
@@ -1292,7 +1380,7 @@ h3 {
   .landing-accent-content {
     top: 20%;
     gap: 50px;
-    width: min(calc(100% - 24px), 340px);
+    width: min(calc(100% - 24px - var(--safe-left) - var(--safe-right)), 340px);
   }
 
   .landing-accent-copy {
@@ -1317,7 +1405,7 @@ h3 {
   }
 
   .landing-travel-line {
-    font-size: 2.05rem;
+    font-size: 1.9rem;
   }
 
   .landing-fourth-panel::after {
@@ -1325,53 +1413,53 @@ h3 {
   }
 
   .landing-fourth-panel {
-    padding: 44px 9px 190px;
+    padding: calc(28px + var(--safe-top)) calc(9px + var(--safe-right))
+      calc(108px + var(--safe-bottom)) calc(9px + var(--safe-left));
   }
 
   .landing-travel-title {
-    padding-left: 35px;
+    padding-left: calc(35px + var(--safe-left));
   }
 
   .landing-travel-copy {
     width: min(100%, 430px);
-    margin-top: 76px;
-    gap: 28px;
+    margin-top: 40px;
+    gap: 18px;
   }
 
   .landing-travel-stop {
-    gap: 14px;
+    gap: 8px;
   }
 
   .landing-travel-stop-title {
-    font-size: 1.15rem;
+    font-size: 0.98rem;
   }
 
   .landing-travel-stop-body {
-    font-size: 1.2rem;
-    line-height: 1.15;
+    font-size: 1rem;
+    line-height: 1.08;
   }
 
   .landing-timeline-line-top {
-    top: 44px;
-    left: 44px;
+    top: calc(44px + var(--safe-top));
+    left: calc(44px + var(--safe-left));
     font-size: 2.05rem;
   }
 
   .landing-timeline-line-bottom {
-    top: 90px;
+    top: calc(90px + var(--safe-top));
     left: 50%;
     font-size: 2.05rem;
     transform: translateX(-31%);
   }
 
   .landing-timeline-art {
-    padding: 140px 0 0;
+    padding: calc(140px + var(--safe-top)) 0 0;
   }
 
   .landing-timeline-artwork {
     width: 100%;
     max-width: none;
-    max-height: none;
   }
 
   .button-row {
@@ -1387,7 +1475,8 @@ h3 {
   }
 
   .rsvp-page {
-    padding: 28px 14px 36px;
+    padding: calc(28px + var(--safe-top)) calc(14px + var(--safe-right))
+      calc(36px + var(--safe-bottom)) calc(14px + var(--safe-left));
   }
 
   .admin-header,

@@ -108,8 +108,7 @@ function AppContent() {
 
   const handleRsvpSubmit = async (responses) => {
     await saveResponse(invitationId, responses);
-    
-    setInvitation(prev => ({ ...prev, has_responded: true, response: responses }));
+    setInvitation((prev) => ({ ...prev, has_responded: true, response: responses }));
   };
 
   return (
@@ -117,29 +116,42 @@ function AppContent() {
       <div className="app-content">
         <Routes>
           <Route path="/admin" element={<AdminPortal />} />
-          
+
           {!invitationId && !loading && (
-            <Route path="*" element={
-              <div className="page page-center confirmation-page">
-                <div className="card confirmation-card status-card">
-                  <h1>Invalid Invite Link</h1>
-                  <p>Please check your invite and try again (or reach out to Mark &lt;3).</p>
+            <Route
+              path="*"
+              element={
+                <div className="page page-center confirmation-page">
+                  <div className="card confirmation-card status-card">
+                    <h1>Invalid Invite Link</h1>
+                    <p>Please check your invite and try again (or reach out to Mark &lt;3).</p>
+                  </div>
                 </div>
-              </div>
-            } />
+              }
+            />
           )}
-          
+
           {invitation && (
             <>
               <Route path="/" element={<HomePage invitation={invitation} />} />
               <Route path="/invite" element={<HomePage invitation={invitation} />} />
-              <Route path="/rsvp" element={<RSVPForm invitation={invitation} courses={courses} onSubmit={handleRsvpSubmit} />} />
-              <Route path="/invite/rsvp" element={<RSVPForm invitation={invitation} courses={courses} onSubmit={handleRsvpSubmit} />} />
+              <Route
+                path="/rsvp"
+                element={
+                  <RSVPForm invitation={invitation} courses={courses} onSubmit={handleRsvpSubmit} />
+                }
+              />
+              <Route
+                path="/invite/rsvp"
+                element={
+                  <RSVPForm invitation={invitation} courses={courses} onSubmit={handleRsvpSubmit} />
+                }
+              />
               <Route path="/confirmation" element={<ConfirmationPage />} />
               <Route path="/invite/confirmation" element={<ConfirmationPage />} />
             </>
           )}
-          
+
           {loading && (
             <Route
               path="*"

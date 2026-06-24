@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import arrowDesign from '../assets/designs/arrow.png';
 import dresscodeDesign from '../assets/designs/dresscode.svg';
+import hotelDesign from '../assets/designs/hotel.svg';
 import LandingCarousel from '../components/LandingCarousel';
 import inviteCardDesign from '../assets/designs/invite_card.svg';
 import planeDesign from '../assets/designs/plane.svg';
@@ -157,12 +158,88 @@ export default function HomePage() {
             guests
           </span>
         </h2>
+
+        <div className="landing-international-card">
+          <span className="landing-international-corner landing-international-corner-tl" aria-hidden="true" />
+          <span className="landing-international-corner landing-international-corner-br" aria-hidden="true" />
+
+          <p className="landing-international-intro">The three nearest airports to Bute are:</p>
+
+          <div className="landing-international-airports">
+            <section className="landing-international-airport">
+              <h3 className="landing-international-airport-name">Glasgow International (GLA)</h3>
+              <p className="landing-international-airport-body">
+                ~45 mins to Wemyss Bay by car. Car hire available; taxis also run directly to the
+                ferry terminal.
+              </p>
+            </section>
+
+            <section className="landing-international-airport">
+              <h3 className="landing-international-airport-name">Glasgow Prestwick (PIK)</h3>
+              <p className="landing-international-airport-body">
+                ~40 mins to Wemyss Bay by car. By train: Prestwick Town - Glasgow Central - Wemyss
+                Bay.
+              </p>
+            </section>
+
+            <section className="landing-international-airport">
+              <h3 className="landing-international-airport-name">Edinburgh Airport (EDI)</h3>
+              <p className="landing-international-airport-body">
+                ~1.5 hrs to Wemyss Bay by car. By train: tram to Edinburgh Waverley - Glasgow
+                Central - Wemyss Bay.
+              </p>
+            </section>
+          </div>
+        </div>
       </section>
 
       <section className="landing-sixth-panel" aria-label="Accommodation section">
-        <h2 className="landing-accommodation-title">
-          <span className="landing-accommodation-line">Accommodation</span>
-        </h2>
+        <img
+          className="landing-accommodation-artwork"
+          src={hotelDesign}
+          alt="Hotel illustration"
+        />
+
+        <h2 className="landing-accommodation-title">accommodation</h2>
+
+        <div className="landing-accommodation-card">
+          <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
+          <span className="landing-accommodation-corner landing-accommodation-corner-tr" aria-hidden="true" />
+          <span className="landing-accommodation-corner landing-accommodation-corner-bl" aria-hidden="true" />
+          <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
+
+          <p className="landing-accommodation-intro">
+            There are several hotels and guest houses located on the island.
+          </p>
+          <p className="landing-accommodation-intro">
+            We recommend booking your accommodation as early as possible – Bute is a beautiful but
+            small island and spaces fill quickly!
+          </p>
+
+          <div className="landing-accommodation-groups">
+            <section className="landing-accommodation-group">
+              <h3 className="landing-accommodation-group-name">Hotels</h3>
+              <p className="landing-accommodation-place">Glenburn Hotel</p>
+              <p className="landing-accommodation-place">Kingarth Hotel</p>
+            </section>
+
+            <section className="landing-accommodation-group">
+              <h3 className="landing-accommodation-group-name">Bed &amp; Breakfast</h3>
+              <p className="landing-accommodation-place">The Ardyne Guest House</p>
+              <p className="landing-accommodation-place">Glendale Guest House</p>
+              <p className="landing-accommodation-place">The Boat House</p>
+              <p className="landing-accommodation-place">Highlander House</p>
+            </section>
+
+            <section className="landing-accommodation-group">
+              <h3 className="landing-accommodation-group-name">Self-Catering &amp; Apartments</h3>
+              <p className="landing-accommodation-place">Lexington Apartments</p>
+              <p className="landing-accommodation-place">Kames Castle Cottages</p>
+              <p className="landing-accommodation-place">The Coach House at Stewart Hall</p>
+              <p className="landing-accommodation-place">Kildavannan Schoolhouse</p>
+            </section>
+          </div>
+        </div>
       </section>
 
       <section className="landing-seventh-panel" aria-label="Dress code section">

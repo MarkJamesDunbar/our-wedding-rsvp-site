@@ -5,6 +5,7 @@ import dresscodeDesign from '../assets/designs/dresscode.svg';
 import hotelDesign from '../assets/designs/hotel.svg';
 import LandingCarousel from '../components/LandingCarousel';
 import inviteCardDesign from '../assets/designs/invite_card.svg';
+import lightbulbDesign from '../assets/designs/lightbulb.svg';
 import planeDesign from '../assets/designs/plane.svg';
 import rsvpPageDesign from '../assets/designs/rsvp-page.svg';
 import timelineDesign from '../assets/designs/timeline-2.svg';
@@ -163,7 +164,7 @@ export default function HomePage() {
           <span className="landing-international-corner landing-international-corner-tl" aria-hidden="true" />
           <span className="landing-international-corner landing-international-corner-br" aria-hidden="true" />
 
-          <p className="landing-international-intro">The three nearest airports to Bute are:</p>
+          <p className="landing-international-intro">Bute has 3 nearby airports:</p>
 
           <div className="landing-international-airports">
             <section className="landing-international-airport">
@@ -204,39 +205,102 @@ export default function HomePage() {
 
         <div className="landing-accommodation-card">
           <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
-          <span className="landing-accommodation-corner landing-accommodation-corner-tr" aria-hidden="true" />
-          <span className="landing-accommodation-corner landing-accommodation-corner-bl" aria-hidden="true" />
           <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
 
           <p className="landing-accommodation-intro">
-            There are several hotels and guest houses located on the island.
+            There are multiple hotels and guest houses on the Isle of Bute.
           </p>
-          <p className="landing-accommodation-intro">
-            We recommend booking your accommodation as early as possible – Bute is a beautiful but
-            small island and spaces fill quickly!
-          </p>
-
           <div className="landing-accommodation-groups">
             <section className="landing-accommodation-group">
               <h3 className="landing-accommodation-group-name">Hotels</h3>
-              <p className="landing-accommodation-place">Glenburn Hotel</p>
-              <p className="landing-accommodation-place">Kingarth Hotel</p>
+              <a
+                className="landing-accommodation-place"
+                href="https://bespokehotels.com/glenburn-hotel/contact-us/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Glenburn Hotel
+              </a>
+              <a
+                className="landing-accommodation-place"
+                href="https://www.kingarth-bute.co.uk/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Kingarth Hotel
+              </a>
             </section>
 
             <section className="landing-accommodation-group">
               <h3 className="landing-accommodation-group-name">Bed &amp; Breakfast</h3>
-              <p className="landing-accommodation-place">The Ardyne Guest House</p>
-              <p className="landing-accommodation-place">Glendale Guest House</p>
-              <p className="landing-accommodation-place">The Boat House</p>
-              <p className="landing-accommodation-place">Highlander House</p>
+              <a
+                className="landing-accommodation-place"
+                href="https://www.theardyneguesthouse.co.uk/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                The Ardyne Guest House
+              </a>
+              <a
+                className="landing-accommodation-place"
+                href="https://www.tripadvisor.co.uk/Hotel_Review-g551924-d660426-Reviews-Glendale_Guest_House-Rothesay_Isle_of_Bute_Argyll_and_Bute_Scotland.html"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Glendale Guest House
+              </a>
+              <a
+                className="landing-accommodation-place"
+                href="https://www.theboathouse-bute.co.uk/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                The Boat House
+              </a>
+              <a
+                className="landing-accommodation-place"
+                href="https://highlanderhouse.co.uk/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Highlander House
+              </a>
             </section>
 
             <section className="landing-accommodation-group">
               <h3 className="landing-accommodation-group-name">Self-Catering &amp; Apartments</h3>
-              <p className="landing-accommodation-place">Lexington Apartments</p>
-              <p className="landing-accommodation-place">Kames Castle Cottages</p>
-              <p className="landing-accommodation-place">The Coach House at Stewart Hall</p>
-              <p className="landing-accommodation-place">Kildavannan Schoolhouse</p>
+              <a
+                className="landing-accommodation-place"
+                href="https://www.lexingtonapartmentsbute.co.uk/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Lexington Apartments
+              </a>
+              <a
+                className="landing-accommodation-place"
+                href="https://www.kamescastlecottages.co.uk/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Kames Castle Cottages
+              </a>
+              <a
+                className="landing-accommodation-place"
+                href="https://www.airbnb.co.uk/rooms/622889571391384500?source_impression_id=p3_1782344120_P3RbiYclIUu_obee"
+                target="_blank"
+                rel="noreferrer"
+              >
+                The Coach House at Stewart Hall
+              </a>
+              <a
+                className="landing-accommodation-place"
+                href="https://www.airbnb.co.uk/rooms/17433211?_set_bev_on_new_domain=1782344180_EANjE2OGU1ZTE0NT&set_everest_cookie_on_new_domain=1782344180.EAZDM2NDRmZGEyYmVmOG.uHyJ3mA0FuZ5q2YLbMltJb14Llwd-X-EfgUhsFYOSkI&source_impression_id=p3_1782344181_P3zEe8h6f6XQ6mcZ"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Kildavannan Schoolhouse
+              </a>
             </section>
           </div>
         </div>
@@ -275,12 +339,54 @@ export default function HomePage() {
       </section>
 
       <section className="landing-eighth-panel" aria-label="Useful things to know section">
+        <img
+          className="landing-useful-artwork"
+          src={lightbulbDesign}
+          alt="Lightbulb illustration"
+        />
+
         <h2 className="landing-centered-title">
           <span className="landing-centered-title-line">useful things</span>
           <span className="landing-centered-title-line landing-centered-title-line-bottom">
             to know
           </span>
         </h2>
+
+        <div className="landing-useful-copy">
+          <section className="landing-useful-stop">
+            <h3 className="landing-useful-stop-title">Cash</h3>
+            <p className="landing-useful-stop-body">
+              We recommend arriving with some cash as card coverage can be limited in more rural
+              parts of the island.
+            </p>
+          </section>
+
+          <section className="landing-useful-stop">
+            <h3 className="landing-useful-stop-title">Mobile signal</h3>
+            <p className="landing-useful-stop-body">
+              Signal on the Isle of Bute can be patchy in places, particularly outside Rothesay.
+              We recommend downloading any maps, ferry tickets, or accommodation confirmations to
+              your phone before you travel – and letting someone know your plans!
+            </p>
+          </section>
+
+          <section className="landing-useful-stop">
+            <h3 className="landing-useful-stop-title">Stocking up</h3>
+            <p className="landing-useful-stop-body">
+              Rothesay is Bute's main town and has everyday essentials including a pharmacy,
+              supermarket, and cash machines. For larger shops or shopping centres, we recommend
+              picking these up on the mainland before taking the ferry.
+            </p>
+          </section>
+
+          <section className="landing-useful-stop">
+            <h3 className="landing-useful-stop-title">The weather</h3>
+            <p className="landing-useful-stop-body">
+              Scotland in June can be glorious – but do pack a layer and a compact umbrella just in
+              case. We'll be keeping our fingers crossed for sunshine!
+            </p>
+          </section>
+        </div>
       </section>
 
       <section className="landing-accent-panel" aria-label="RSVP reminder section">
@@ -300,6 +406,8 @@ export default function HomePage() {
           <p className="landing-accent-deadline">rsvp by 31 Aug 2026</p>
         </div>
       </section>
+
+      <div className="landing-page-tail" aria-hidden="true" />
     </div>
   );
 }

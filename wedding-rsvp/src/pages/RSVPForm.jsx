@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { menuDetails } from '../data/menuOptions';
 
@@ -31,6 +31,15 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   const step = searchParams.get('step') === 'menu' ? 'menu' : 'attendance';
   const rsvpPath = `/invite/rsvp?id=${invitation.qr_code}`;
 
+  // If the menu step is opened with no attending guests (e.g. a direct reload
+  // resets the in-progress selections), send them back to the attendance step.
+  useEffect(() => {
+    const hasAttending = responses.some((response) => response.attending === true);
+    if (step === 'menu' && !hasAttending) {
+      navigate(rsvpPath, { replace: true });
+    }
+  }, [step, responses, navigate, rsvpPath]);
+
   const handleAttendingChange = (index, attending) => {
     const updated = [...responses];
     updated[index].attending = attending;
@@ -50,7 +59,7 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
 
     if (!hasAttendingGuest) {
       await onSubmit(responses);
-      navigate(`/invite/confirmation?id=${invitation.qr_code}`);
+      navigate(`/invite/confirmation?id=${invitation.qr_code}&attending=none`);
       return;
     }
 
@@ -65,6 +74,8 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
         
         {responses.map((response, idx) => (
           <div key={idx} className="card guest-card">
+            <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
+            <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
             <h3>{response.name}</h3>
             
             <div className="button-row">
@@ -141,7 +152,7 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
 
     setInvalidCourseFields({});
     await onSubmit(responses);
-    navigate(`/invite/confirmation?id=${invitation.qr_code}`);
+    navigate(`/invite/confirmation?id=${invitation.qr_code}&attending=some`);
   };
 
   return (
@@ -150,6 +161,8 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
       
       {attendingGuests.map((guest) => (
         <div key={guest.name} className="card guest-card menu-preview-card menu-guest-card">
+          <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
+          <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
           <div className="menu-preview-intro menu-guest-intro">
             <h2 className="menu-guest-name">{guest.name}</h2>
             <p className="menu-guest-subtitle">Your Choices</p>
@@ -229,6 +242,7 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
 
           <div className="menu-section menu-dietary-section">
             <h3>Dietary Requirements</h3>
+            <p className="menu-dietary-note">Please also include any vegan requirements here.</p>
             <div className="form-field menu-dietary-field">
               <textarea
                 id={`dietary-${guest.name}`}

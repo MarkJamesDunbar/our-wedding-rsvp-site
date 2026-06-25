@@ -59,12 +59,17 @@ body,
   min-height: 100%;
   width: 100%;
   margin: 0;
+  /* Clip (NOT hidden) horizontal overflow on the root scroller too, so the
+     page is never sideways-scrollable. `clip` keeps the document as the
+     vertical scroller, preserving iOS toolbar collapse + safe areas. */
+  overflow-x: clip;
 }
 
 html.homepage-snap,
 body.homepage-snap {
-  /* `mandatory` so the page always comes to rest at a snap point (each
-     section's top) and never parks mid-page or in the seam. */
+  /* `mandatory` so each page reliably settles to its top. `proximity` felt too
+     weak (pages parked mid-scroll). The slight landing correction is the
+     inherent cost of mandatory's exact alignment. */
   scroll-snap-type: y mandatory;
 }
 
@@ -246,6 +251,35 @@ h3 {
   max-width: 540px;
 }
 
+/* Loading screen uses the brand card design (cream, square, deep shadow, corners). */
+.loading-card {
+  position: relative;
+  max-width: 540px;
+  padding: 52px 40px;
+  border: 0;
+  border-radius: 0;
+  background: #fbf7ef;
+  box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  text-align: center;
+}
+
+.loading-card > :not(span) {
+  position: relative;
+  z-index: 1;
+}
+
+.loading-card h1 {
+  margin-bottom: 6px;
+  color: var(--red);
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 2.2rem;
+  line-height: 0.95;
+  text-transform: lowercase;
+}
+
 .eyebrow {
   margin-bottom: 8px;
   color: var(--sage);
@@ -280,7 +314,6 @@ h3 {
   height: 100vh;
   height: 100dvh;
   scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 /* Gap between consecutive pages. `scroll-snap-align: start` keeps snapping to
@@ -317,17 +350,15 @@ h3 {
      zones that Safari paints with the page background colour. */
   inset: calc(-1 * var(--safe-top)) 0 calc(-1 * var(--safe-bottom));
   z-index: -1;
-  /* Soft cream vignette top + bottom so the photo melts seamlessly into the
-     cream that fills the status-bar and home-indicator areas. No hard band,
-     whether or not iOS exposes the safe-area insets. */
+  /* Soft cream fade at the very top so the photo melts into the cream that
+     fills the status-bar area. No overall film over the photo. */
   background:
     linear-gradient(
       to bottom,
       var(--page-bg) 0,
       rgba(247, 235, 219, 0) calc(var(--safe-top) + 72px),
       rgba(247, 235, 219, 0) 100%
-    ),
-    rgba(255, 255, 255, 0.2);
+    );
 }
 
 .landing-card-wrap {
@@ -535,7 +566,7 @@ h3 {
   display: flex;
   flex-direction: column;
   padding-bottom: calc(24px + var(--safe-bottom));
-  background: var(--page-bg);
+  background: var(--page-bg) url('./assets/designs/international.jpg') center / cover no-repeat;
   overflow: hidden;
 }
 
@@ -548,6 +579,11 @@ h3 {
 
 .landing-eighth-panel {
   /* Panel itself is the regular cream; the blue lives in the gap below it. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(48px + var(--safe-top)) calc(28px + var(--safe-right))
+    calc(40px + var(--safe-bottom)) calc(28px + var(--safe-left));
   background: var(--page-bg);
 }
 
@@ -597,6 +633,11 @@ h3 {
 /* The hotel graphic is nearly square (vs the wide dresscode shoes), so match it
    to the dresscode artwork's RENDERED height rather than its width. */
 .landing-accommodation-artwork {
+  width: auto;
+  height: 100px;
+}
+
+.landing-useful-artwork {
   width: auto;
   height: 100px;
 }
@@ -674,14 +715,34 @@ h3 {
 .landing-accent-panel {
   position: relative;
   background: #e0eae6;
-  overflow: hidden;
+  overflow: visible;
+}
+
+/* The tail directly follows the last page, so drop the page-gap that would
+   otherwise show a cream strip between the green panel and the green tail. */
+.landing-page > section.landing-accent-panel {
+  margin-bottom: 0;
+}
+
+/* Give the "useful things to know" page a little extra length so its content
+   isn't cramped against the bottom edge. */
+.landing-page > section.landing-eighth-panel {
+  height: calc(100vh + 40px);
+  height: calc(100dvh + 40px);
+}
+
+/* Filler below the final page so the overscroll/safe area lands on the green
+   instead of the cream page background, and bleeding sections have a backdrop. */
+.landing-page-tail {
+  height: 200px;
+  background: #e0eae6;
 }
 
 .landing-accent-artwork {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: -100px;
   z-index: 0;
   width: 100%;
   max-width: none;
@@ -866,7 +927,7 @@ h3 {
   position: relative;
   z-index: 1;
   width: min(100%, 460px);
-  margin: 26px auto 0;
+  margin: 64px auto 0;
   padding: 46px 44px;
   background: #fbf7ef;
   box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22);
@@ -930,24 +991,33 @@ h3 {
 }
 
 .landing-accommodation-group-name {
-  margin: 0 0 3px;
-  font-size: 1.45rem;
-  font-weight: 700;
-  line-height: 1.1;
-  text-decoration: underline;
+  margin: 0 0 6px;
+  color: var(--red);
+  font-family: var(--font-script);
+  font-size: 1.65rem;
+  font-weight: 400;
+  line-height: 1;
 }
 
 .landing-accommodation-place {
+  display: block;
   margin: 0;
+  color: var(--text);
   font-size: 1.3rem;
   font-weight: 500;
   line-height: 1.3;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.landing-accommodation-place:hover {
+  color: var(--red);
 }
 
 .landing-centered-title {
   position: relative;
-  margin: 0;
-  padding-top: calc(110px + var(--safe-top));
+  margin: 16px 0 0;
+  padding-top: 0;
   color: var(--red);
   font-family: var(--font-script);
   font-weight: 400;
@@ -962,7 +1032,43 @@ h3 {
 }
 
 .landing-centered-title-line-bottom {
-  margin-top: 18px;
+  margin-top: 12px;
+}
+
+.landing-useful-copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 34px;
+  width: min(100%, 760px);
+  margin-top: 36px;
+  text-align: center;
+}
+
+.landing-useful-stop {
+  display: grid;
+  gap: 14px;
+}
+
+.landing-useful-stop-title,
+.landing-useful-stop-body {
+  margin: 0;
+}
+
+.landing-useful-stop-title {
+  color: var(--red);
+  font-family: var(--font-script);
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.landing-useful-stop-body {
+  color: #54535b;
+  font-family: var(--font-recoleta);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.18;
 }
 
 .landing-fourth-panel::after {
@@ -1097,8 +1203,9 @@ h3 {
 }
 
 .rsvp-page h1 {
-  margin-bottom: 4px;
+  margin-bottom: 20px;
   text-align: center;
+  text-transform: lowercase;
 }
 
 .guest-card,
@@ -1133,7 +1240,7 @@ h3 {
 }
 
 .menu-guest-name {
-  margin-bottom: 0;
+  margin-bottom: 8px;
   font-family: var(--font-script);
   font-size: 2rem;
 }
@@ -1155,10 +1262,22 @@ h3 {
   font-size: 0.95rem;
 }
 
+/* Menu section: everything that isn't a Beth Ellen heading uses Cormorant. */
+.menu-guest-card,
+.menu-guest-card textarea {
+  font-family: var(--font-serif);
+}
+
 .menu-section {
   margin-top: 4px;
   padding-top: 18px;
   border-top: 1px solid var(--red-line);
+}
+
+.menu-dietary-note {
+  margin: -2px 0 6px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
 .menu-choice-list,
@@ -1175,10 +1294,9 @@ h3 {
   display: grid;
   align-items: start;
   gap: 10px;
-  padding: 14px 16px;
-  border: 1px solid var(--red-line);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.7);
+  padding: 6px 2px;
+  border: 0;
+  background: transparent;
 }
 
 .menu-choice-option {
@@ -1186,9 +1304,8 @@ h3 {
   cursor: pointer;
 }
 
-.menu-choice-option.is-selected {
-  border-color: rgba(142, 31, 29, 0.45);
-  background: rgba(142, 31, 29, 0.08);
+.menu-choice-option.is-selected .menu-choice-title {
+  color: var(--red);
 }
 
 .menu-choice-input {
@@ -1199,9 +1316,9 @@ h3 {
 
 .menu-choice-control {
   position: relative;
-  width: 18px;
-  height: 18px;
-  margin-top: 3px;
+  width: 20px;
+  height: 20px;
+  margin-top: 4px;
   border: 1.5px solid var(--red);
   border-radius: 999px;
 }
@@ -1223,7 +1340,9 @@ h3 {
 .menu-item-name {
   margin-bottom: 0;
   color: var(--text);
+  font-size: 1.28rem;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .menu-choice-prefix {
@@ -1233,13 +1352,131 @@ h3 {
 .menu-choice-note,
 .menu-item-note {
   color: var(--text-muted);
-  font-size: 0.92rem;
+  font-size: 1.02rem;
 }
 
 .menu-course-field-error {
   border-radius: 18px;
   outline: 2px solid rgba(142, 31, 29, 0.18);
   outline-offset: 8px;
+}
+
+/* --- RSVP + confirmation pages: accommodation-style cards, Beth Ellen
+   titles/names, and the landing RSVP (accent) button. --- */
+.rsvp-page .card,
+.confirmation-card {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: #fbf7ef;
+  box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.rsvp-page .card {
+  padding: 56px 42px;
+}
+
+/* Keep card content above the absolutely-positioned corner flourishes. */
+.rsvp-page .card > :not(span),
+.confirmation-card > :not(span) {
+  position: relative;
+  z-index: 1;
+}
+
+.rsvp-page h1,
+.confirmation-card h1 {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 3rem;
+  line-height: 0.9;
+}
+
+.guest-card > h3,
+.menu-guest-name {
+  padding-left: 8px;
+  color: var(--red);
+  font-family: var(--font-script);
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+.guest-card > h3 {
+  font-size: 1.7rem;
+}
+
+.menu-guest-name {
+  padding-left: 0;
+  font-size: 1.5rem;
+}
+
+/* Course labels (Starter, Intermediate, Main, ...) in Beth Ellen. */
+.menu-section h3 {
+  font-family: var(--font-script);
+  font-weight: 400;
+}
+
+.rsvp-page button {
+  min-height: 50px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 0;
+  background: #313635;
+  color: #f7ebdb;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  box-shadow: 0 10px 18px rgba(49, 54, 53, 0.18);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.rsvp-page button:active {
+  transform: translateY(2px) scale(0.992);
+}
+
+.rsvp-page .btn-ghost {
+  border: 1.5px solid rgba(142, 31, 29, 0.45);
+  background: #ffffff;
+  color: var(--red);
+  box-shadow: 0 6px 14px rgba(44, 31, 28, 0.1);
+}
+
+/* Accept / decline use Cormorant (Beth Ellen is too hard to read here). */
+.rsvp-page .can-attend,
+.rsvp-page .cannot-attend {
+  font-family: var(--font-serif);
+  font-size: 1.18rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.rsvp-page .btn-danger {
+  background: #8d5b59;
+  color: #f7ebdb;
+}
+
+/* Accept, when chosen, stays the sage green. */
+.rsvp-page .btn-success {
+  background: var(--sage);
+  color: #f7ebdb;
+}
+
+/* Primary actions (Next / Submit): red "card" buttons with a clear shadow + press animation. */
+.rsvp-page .next-button {
+  background: var(--red);
+  color: #f7ebdb;
+  box-shadow: 0 12px 26px rgba(142, 31, 29, 0.3), 0 22px 50px rgba(44, 31, 28, 0.22);
+}
+
+.rsvp-page .next-button:hover {
+  box-shadow: 0 16px 32px rgba(142, 31, 29, 0.34), 0 28px 64px rgba(44, 31, 28, 0.26);
+}
+
+.rsvp-page .next-button:active {
+  transform: translateY(3px) scale(0.99);
+  box-shadow: 0 6px 14px rgba(142, 31, 29, 0.32);
 }
 
 .confirmation-card {
@@ -1290,6 +1527,58 @@ h3 {
 
 .confirmation-loading span:nth-child(3) {
   animation-delay: 0.24s;
+}
+
+/* --- Confirmation: thank-you script + spinning Mount Stuart crest --- */
+.confirmation-thanks {
+  display: grid;
+  justify-items: center;
+  gap: 44px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.confirmation-script {
+  margin: 0;
+  color: var(--red);
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+.confirmation-crest {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(80vw, 360px);
+  aspect-ratio: 1 / 1;
+}
+
+.confirmation-crest .circular-text {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(142, 31, 29, 0.62);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.confirmation-crest .circular-text-char {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+}
+
+.confirmation-crest-bouquet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48%;
+  transform: translate(-50%, -50%);
 }
 
 .admin-header {
@@ -1393,8 +1682,19 @@ h3 {
     border-radius: 22px;
   }
 
+  /* Loading card stays square even though .card rounds on mobile. */
+  .loading-card {
+    border-radius: 0;
+  }
+
   .landing-hero {
     padding: 0 calc(12px + var(--safe-right)) 0 calc(12px + var(--safe-left));
+    overflow: visible;
+  }
+
+  .landing-hero::before {
+    inset: calc(-1 * var(--safe-top)) calc(-1 * var(--safe-right))
+      calc(-1 * var(--safe-bottom) - 60px) calc(-1 * var(--safe-left));
   }
 
   .landing-card-wrap {
@@ -1412,7 +1712,7 @@ h3 {
     width: 100%;
     /* Only grow to 12rem when a safe-area inset exists; otherwise stay 85px. */
     height: 5.5rem;
-    bottom:7.5rem;
+    bottom: 2.5rem;
     margin: 0;
     padding: 0 0 max(8px, var(--safe-bottom));
   }
@@ -1543,6 +1843,7 @@ h3 {
   .landing-sixth-panel {
     padding: calc(34px + var(--safe-top)) calc(18px + var(--safe-right))
       calc(24px + var(--safe-bottom)) calc(18px + var(--safe-left));
+    overflow: visible;
   }
 
   .landing-accommodation-title {
@@ -1552,7 +1853,7 @@ h3 {
 
   .landing-accommodation-card {
     width: min(100%, 360px);
-    margin-top: 20px;
+    margin-top: 44px;
     padding: 34px 30px;
   }
 
@@ -1591,7 +1892,7 @@ h3 {
   }
 
   .landing-accommodation-group-name {
-    font-size: 1.25rem;
+    font-size: 1.45rem;
   }
 
   .landing-accommodation-place {
@@ -1602,7 +1903,7 @@ h3 {
   .landing-dresscode-content {
     gap: 14px;
     width: min(100%, 430px);
-    height: 36rem;
+    height: 40rem;
   }
 
   .landing-dresscode-artwork {
@@ -1610,6 +1911,11 @@ h3 {
   }
 
   .landing-accommodation-artwork {
+    width: auto;
+    height: 78px;
+  }
+
+  .landing-useful-artwork {
     width: auto;
     height: 78px;
   }
@@ -1639,7 +1945,8 @@ h3 {
   }
 
   .landing-centered-title {
-    padding-top: calc(118px + var(--safe-top));
+    margin-top: 12px;
+    padding-top: 0;
   }
 
   .landing-centered-title-line {
@@ -1648,6 +1955,30 @@ h3 {
 
   .landing-centered-title-line-bottom {
     margin-top: 14px;
+  }
+
+  .landing-eighth-panel {
+    padding: calc(28px + var(--safe-top)) calc(16px + var(--safe-right))
+      calc(28px + var(--safe-bottom)) calc(16px + var(--safe-left));
+  }
+
+  .landing-useful-copy {
+    width: min(100%, 430px);
+    margin-top: 28px;
+    gap: 16px;
+  }
+
+  .landing-useful-stop {
+    gap: 8px;
+  }
+
+  .landing-useful-stop-title {
+    font-size: 1.2rem;
+  }
+
+  .landing-useful-stop-body {
+    font-size: 1.15rem;
+    line-height: 1.12;
   }
 
   .landing-accent-content {
@@ -1683,11 +2014,28 @@ h3 {
 
   .landing-fourth-panel::after {
     background-position: center bottom;
+    bottom: -60px;
   }
 
   .landing-fourth-panel {
     padding: calc(28px + var(--safe-top)) calc(9px + var(--safe-right))
       calc(108px + var(--safe-bottom)) calc(9px + var(--safe-left));
+    overflow: visible;
+  }
+
+  .landing-fifth-panel {
+    overflow: visible;
+    isolation: isolate;
+    background: transparent;
+  }
+
+  .landing-fifth-panel::before {
+    content: '';
+    position: absolute;
+    inset: -60px 0;
+    z-index: -1;
+    background: url('./assets/designs/international.jpg') center / cover no-repeat;
+    pointer-events: none;
   }
 
   .landing-travel-title {
@@ -1740,16 +2088,45 @@ h3 {
   }
 
   .button-row > button {
-    width: 100%;
+    width: min(100%, 280px);
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .button-row-right {
-    justify-content: stretch;
+    justify-content: flex-end;
+  }
+
+  .button-row-right > button {
+    width: auto;
+    margin-right: 0;
+    margin-left: 0;
   }
 
   .rsvp-page {
-    padding: calc(28px + var(--safe-top)) calc(14px + var(--safe-right))
-      calc(36px + var(--safe-bottom)) calc(14px + var(--safe-left));
+    padding: calc(28px + var(--safe-top)) calc(10px + var(--safe-right))
+      calc(36px + var(--safe-bottom)) calc(10px + var(--safe-left));
+  }
+
+  .rsvp-page .card {
+    padding: 50px 28px;
+  }
+
+  .rsvp-page h1,
+  .confirmation-card h1 {
+    font-size: 2.6rem;
+  }
+
+  .guest-card > h3 {
+    font-size: 1.55rem;
+  }
+
+  .menu-guest-name {
+    font-size: 1.35rem;
+  }
+
+  .confirmation-script {
+    font-size: 2.05rem;
   }
 
   .admin-header,

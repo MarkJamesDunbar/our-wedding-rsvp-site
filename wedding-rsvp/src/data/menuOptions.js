@@ -19,16 +19,6 @@ export const menuDetails = {
       ]
     },
     {
-      id: 'intermediate',
-      label: 'Intermediate',
-      type: 'served',
-      items: [
-        {
-          value: 'Compressed Watermelon Gin & Tonic Essence (served to all guests)'
-        }
-      ]
-    },
-    {
       id: 'course_2',
       label: 'Main',
       type: 'choice',

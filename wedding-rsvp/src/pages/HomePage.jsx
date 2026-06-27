@@ -85,7 +85,7 @@ export default function HomePage() {
               </a>{' '}
               on the Isle of Bute, Scotland. To reach us, you will need to take the
               ferry from Wemyss Bay to Rothesay. The ferry takes both cars and
-              pedestrians, and takes about 35 minutes.
+              pedestrians, and is ~35 minutes.
             </p>
           </section>
 
@@ -110,7 +110,7 @@ export default function HomePage() {
               >
                 Wemyss Bay station
               </a>
-              , which is directly connected to the ferry terminal.
+              (connected to the ferry terminal).
             </p>
           </section>
 
@@ -126,7 +126,7 @@ export default function HomePage() {
               >
                 CalMac website
               </a>{' '}
-              - summer sailings fill quickly. See below for timetables and tickets.
+              - summer sailings fill quickly.
             </p>
           </section>
 
@@ -164,7 +164,7 @@ export default function HomePage() {
           <span className="landing-international-corner landing-international-corner-tl" aria-hidden="true" />
           <span className="landing-international-corner landing-international-corner-br" aria-hidden="true" />
 
-          <p className="landing-international-intro">Bute has 3 nearby airports:</p>
+          {/* <p className="landing-international-intro">Bute has 3 nearby airports:</p> */}
 
           <div className="landing-international-airports">
             <section className="landing-international-airport">
@@ -207,9 +207,9 @@ export default function HomePage() {
           <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
           <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
 
-          <p className="landing-accommodation-intro">
+          {/* <p className="landing-accommodation-intro">
             There are multiple hotels and guest houses on the Isle of Bute.
-          </p>
+          </p> */}
           <div className="landing-accommodation-groups">
             <section className="landing-accommodation-group">
               <h3 className="landing-accommodation-group-name">Hotels</h3>

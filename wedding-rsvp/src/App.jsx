@@ -123,8 +123,11 @@ function AppContent() {
               element={
                 <div className="page page-center confirmation-page">
                   <div className="card confirmation-card status-card">
-                    <h1>Invalid Invite Link</h1>
-                    <p>Please check your invite and try again (or reach out to Mark &lt;3).</p>
+                    <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
+                    <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
+
+                    <h1>Invalid Link</h1>
+                    <p>Please check your invite QR code and try again (or reach out to Mark &lt;3).</p>
                   </div>
                 </div>
               }
@@ -156,10 +159,11 @@ function AppContent() {
             <Route
               path="*"
               element={
-                <div className="page page-center">
-                  <div className="card status-card">
-                    <p className="eyebrow">Loading</p>
-                    <h1>Getting your invitation</h1>
+                <div className="page page-center confirmation-page">
+                  <div className="card confirmation-card status-card">
+                    <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
+                    <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
+                    <h1>getting your invitation</h1>
                     <p>Just a moment while we fetch your details.</p>
                   </div>
                 </div>

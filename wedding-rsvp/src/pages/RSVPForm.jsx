@@ -165,7 +165,7 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
           <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
           <div className="menu-preview-intro menu-guest-intro">
             <h2 className="menu-guest-name">{guest.name}</h2>
-            <p className="menu-guest-subtitle">Your Choices</p>
+            <p className="menu-guest-subtitle">Your Menu</p>
             <p className="menu-guest-meta">{menuDetails.intro} {menuDetails.legend}</p>
           </div>
 
@@ -242,11 +242,11 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
 
           <div className="menu-section menu-dietary-section">
             <h3>Dietary Requirements</h3>
-            <p className="menu-dietary-note">Please also include any vegan requirements here.</p>
+            <p className="menu-dietary-note">Please include dietary requirements here.</p>
             <div className="form-field menu-dietary-field">
               <textarea
                 id={`dietary-${guest.name}`}
-                placeholder="Any dietary needs or allergies we should know about?"
+                placeholder="(e.g., vegan, gluten-free, allergies)"
                 value={guest.dietary}
                 onChange={(e) => handleDietaryChange(guest.name, e.target.value)}
               />

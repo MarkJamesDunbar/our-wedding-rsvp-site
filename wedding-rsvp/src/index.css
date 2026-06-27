@@ -85,7 +85,8 @@ body {
   overflow-x: clip;
   background: var(--page-bg);
   color: var(--text);
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
   line-height: 1.5;
 }
 
@@ -129,7 +130,7 @@ input[type='text'] {
   width: 100%;
   padding: 14px 16px;
   border: 1px solid var(--red-line);
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.75);
   color: var(--text);
 }
@@ -155,7 +156,7 @@ h3 {
 }
 
 h1 {
-  font-size: 2.6rem;
+  font-size: 2.8rem;
   font-weight: 600;
 }
 
@@ -251,6 +252,59 @@ h3 {
   max-width: 540px;
 }
 
+.confirmation-page {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 18px;
+}
+
+.confirmation-card.status-card {
+  position: relative;
+  width: min(100%, 540px);
+  max-width: 540px;
+  padding: 56px 42px;
+  border: 0;
+  border-radius: 0;
+  background: rgba(244, 242, 237, 0.85);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  text-align: center;
+  color: var(--red);
+}
+
+.confirmation-card.status-card > :not(span) {
+  position: relative;
+  z-index: 1;
+}
+
+.confirmation-card.status-card .eyebrow {
+  margin: 0 0 14px;
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.confirmation-card.status-card h1 {
+  margin: 0 0 22px;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 1.78rem;
+  line-height: 0.9;
+  color: var(--red);
+}
+
+.confirmation-card.status-card p:not(.eyebrow) {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: var(--red);
+}
 /* Loading screen uses the brand card design (cream, square, deep shadow, corners). */
 .loading-card {
   position: relative;
@@ -395,7 +449,7 @@ h3 {
   padding: 0 0 var(--safe-bottom);
   color: var(--red);
   /* Solid cream box, semi-transparent so the photo still shows through. */
-  background: rgba(247, 235, 219, 0.78);
+  background: rgba(247, 235, 219, 0.85);
 }
 
 .landing-scroll-inner {
@@ -570,7 +624,15 @@ h3 {
   overflow: hidden;
 }
 
-.landing-sixth-panel,
+.landing-sixth-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(24px + var(--safe-bottom));
+  background: var(--page-bg) url('./assets/designs/accommodation.png') center / cover no-repeat;
+  overflow: hidden;
+}
+
 .landing-seventh-panel,
 .landing-eighth-panel {
   position: relative;
@@ -854,7 +916,7 @@ h3 {
   width: min(100%, 460px);
   margin: 80px auto 0;
   padding: 80px 80px;
-  background: #fbf7ef;
+  background: rgba(244, 242, 237, 0.85);
   box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22);
   color: var(--text);
   font-family: 'Cormorant Garamond', Garamond, Georgia, serif;
@@ -929,7 +991,7 @@ h3 {
   width: min(100%, 460px);
   margin: 64px auto 0;
   padding: 46px 44px;
-  background: #fbf7ef;
+  background: rgba(244, 242, 237, 0.85);
   box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22);
   color: var(--text);
   font-family: 'Cormorant Garamond', Garamond, Georgia, serif;
@@ -1195,11 +1257,27 @@ h3 {
 .rsvp-page {
   max-width: 800px;
   margin: 0 auto;
-  padding: calc(36px + var(--safe-top)) calc(20px + var(--safe-right))
-    calc(48px + var(--safe-bottom)) calc(20px + var(--safe-left));
+  padding: calc(36px + var(--safe-top)) calc(30px + var(--safe-right))
+    calc(48px + var(--safe-bottom)) calc(30px + var(--safe-left));
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 30px;
+}
+
+.rsvp-page::before,
+.confirmation-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--page-bg) url('./assets/designs/rsvp.png') center / cover no-repeat;
+  pointer-events: none;
+}
+
+.rsvp-page > *,
+.confirmation-page > * {
+  position: relative;
+  z-index: 1;
 }
 
 .rsvp-page h1 {
@@ -1211,8 +1289,9 @@ h3 {
 .guest-card,
 .menu-preview-card {
   display: flex;
+  padding-left: 20px;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .button-row {
@@ -1236,7 +1315,7 @@ h3 {
 .menu-preview-intro,
 .menu-guest-intro {
   display: grid;
-  gap: 6px;
+  gap: 12px;
 }
 
 .menu-guest-name {
@@ -1248,7 +1327,7 @@ h3 {
 .menu-guest-subtitle {
   margin-bottom: 0;
   color: var(--text-muted);
-  font-size: 0.86rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1258,26 +1337,28 @@ h3 {
 .menu-children-copy,
 .caption {
   margin-bottom: 0;
+  font-family: var(--font-serif);
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 1.28rem;
 }
 
 /* Menu section: everything that isn't a Beth Ellen heading uses Cormorant. */
 .menu-guest-card,
 .menu-guest-card textarea {
   font-family: var(--font-serif);
+  font-size: 0.98rem;
 }
 
 .menu-section {
   margin-top: 4px;
-  padding-top: 18px;
+  padding-top: 40px;
   border-top: 1px solid var(--red-line);
 }
 
 .menu-dietary-note {
   margin: -2px 0 6px;
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
 .menu-choice-list,
@@ -1316,9 +1397,9 @@ h3 {
 
 .menu-choice-control {
   position: relative;
-  width: 20px;
-  height: 20px;
-  margin-top: 4px;
+  width: 15px;
+  height: 15px;
+  margin-top: 5px;
   border: 1.5px solid var(--red);
   border-radius: 999px;
 }
@@ -1368,8 +1449,8 @@ h3 {
   position: relative;
   border: 0;
   border-radius: 0;
-  background: #fbf7ef;
-  box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22);
+  background: rgba(244, 242, 237, 0.85);
+  /* box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22); */
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -1389,7 +1470,7 @@ h3 {
 .confirmation-card h1 {
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: 3rem;
+  font-size: 1.78rem;
   line-height: 0.9;
 }
 
@@ -1465,13 +1546,13 @@ h3 {
 
 /* Primary actions (Next / Submit): red "card" buttons with a clear shadow + press animation. */
 .rsvp-page .next-button {
-  background: var(--red);
+  /* background: var(--red); */
   color: #f7ebdb;
-  box-shadow: 0 12px 26px rgba(142, 31, 29, 0.3), 0 22px 50px rgba(44, 31, 28, 0.22);
+  /* box-shadow: 0 12px 26px rgba(142, 31, 29, 0.3), 0 22px 50px rgba(44, 31, 28, 0.22); */
 }
 
 .rsvp-page .next-button:hover {
-  box-shadow: 0 16px 32px rgba(142, 31, 29, 0.34), 0 28px 64px rgba(44, 31, 28, 0.26);
+  /* box-shadow: 0 16px 32px rgba(142, 31, 29, 0.34), 0 28px 64px rgba(44, 31, 28, 0.26); */
 }
 
 .rsvp-page .next-button:active {
@@ -1533,7 +1614,7 @@ h3 {
 .confirmation-thanks {
   display: grid;
   justify-items: center;
-  gap: 44px;
+  gap: 90px;
   padding: 0 24px;
   text-align: center;
 }
@@ -1543,7 +1624,7 @@ h3 {
   color: var(--red);
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: 2.5rem;
+  font-size: 2rem;
   line-height: 1.2;
 }
 
@@ -1577,7 +1658,7 @@ h3 {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 48%;
+  width: 60%;
   transform: translate(-50%, -50%);
 }
 
@@ -1679,12 +1760,28 @@ h3 {
 
   .card {
     padding: 24px 20px;
-    border-radius: 22px;
+    border-radius: 0px;
   }
 
   /* Loading card stays square even though .card rounds on mobile. */
   .loading-card {
     border-radius: 0;
+  }
+
+  .confirmation-page {
+    padding: 22px 14px;
+  }
+
+  .confirmation-card.status-card {
+    padding: 46px 30px;
+  }
+
+  .confirmation-card.status-card h1 {
+    font-size: 1.7rem;
+  }
+
+  .confirmation-card.status-card p:not(.eyebrow) {
+    font-size: 1.05rem;
   }
 
   .landing-hero {
@@ -2088,33 +2185,36 @@ h3 {
   }
 
   .button-row > button {
-    width: min(100%, 280px);
+    width: min(100%, 270px);
     margin-right: auto;
     margin-left: auto;
   }
 
   .button-row-right {
-    justify-content: flex-end;
-  }
+    align-items:center;
+    }
 
   .button-row-right > button {
-    width: auto;
+    width: 270px;;
     margin-right: 0;
     margin-left: 0;
   }
 
   .rsvp-page {
-    padding: calc(28px + var(--safe-top)) calc(10px + var(--safe-right))
-      calc(36px + var(--safe-bottom)) calc(10px + var(--safe-left));
+    padding: calc(28px + var(--safe-top)) calc(30px + var(--safe-right))
+      calc(36px + var(--safe-bottom)) calc(30px + var(--safe-left));
   }
 
   .rsvp-page .card {
-    padding: 50px 28px;
+    padding: 50px 50px 70px 50px;
+    /* padding-bottom: 70px;
+    padding-left: 40px;
+    padding-right: 28px; */
   }
 
   .rsvp-page h1,
   .confirmation-card h1 {
-    font-size: 2.6rem;
+    font-size: 1.8rem;
   }
 
   .guest-card > h3 {
@@ -2122,11 +2222,11 @@ h3 {
   }
 
   .menu-guest-name {
-    font-size: 1.35rem;
+    font-size: 1.6rem;
   }
 
   .confirmation-script {
-    font-size: 2.05rem;
+    font-size: 1.75rem;
   }
 
   .admin-header,

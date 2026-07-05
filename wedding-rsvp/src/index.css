@@ -305,35 +305,6 @@ h3 {
   line-height: 1.55;
   color: var(--red);
 }
-/* Loading screen uses the brand card design (cream, square, deep shadow, corners). */
-.loading-card {
-  position: relative;
-  max-width: 540px;
-  padding: 52px 40px;
-  border: 0;
-  border-radius: 0;
-  background: #fbf7ef;
-  box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  text-align: center;
-}
-
-.loading-card > :not(span) {
-  position: relative;
-  z-index: 1;
-}
-
-.loading-card h1 {
-  margin-bottom: 6px;
-  color: var(--red);
-  font-family: var(--font-script);
-  font-weight: 400;
-  font-size: 2.2rem;
-  line-height: 0.95;
-  text-transform: lowercase;
-}
-
 .eyebrow {
   margin-bottom: 8px;
   color: var(--sage);
@@ -1007,12 +978,7 @@ h3 {
   pointer-events: none;
 }
 
-/* corner.svg is drawn as a TOP-RIGHT ornament; mirror it onto the other three. */
-.landing-accommodation-corner-tr {
-  top: 12px;
-  right: 12px;
-}
-
+/* corner.svg is drawn as a TOP-RIGHT ornament; mirror it onto the others. */
 .landing-accommodation-corner-tl {
   top: 12px;
   left: 12px;
@@ -1023,12 +989,6 @@ h3 {
   right: 12px;
   bottom: 12px;
   transform: scaleY(-1);
-}
-
-.landing-accommodation-corner-bl {
-  left: 12px;
-  bottom: 12px;
-  transform: scale(-1, -1);
 }
 
 .landing-accommodation-intro {
@@ -1567,51 +1527,6 @@ h3 {
   text-align: center;
 }
 
-.confirmation-status {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-}
-
-.confirmation-check {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  background: rgba(142, 31, 29, 0.1);
-  color: var(--red);
-  font-size: 1.7rem;
-}
-
-.confirmation-message {
-  max-width: 26ch;
-  margin-bottom: 0;
-}
-
-.confirmation-loading {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 18px;
-}
-
-.confirmation-loading span {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: rgba(142, 31, 29, 0.44);
-  animation: pulseDot 1.2s ease-in-out infinite;
-}
-
-.confirmation-loading span:nth-child(2) {
-  animation-delay: 0.12s;
-}
-
-.confirmation-loading span:nth-child(3) {
-  animation-delay: 0.24s;
-}
-
 /* --- Confirmation: thank-you script + spinning Mount Stuart crest --- */
 .confirmation-thanks {
   display: grid;
@@ -1736,20 +1651,6 @@ h3 {
   }
 }
 
-@keyframes pulseDot {
-  0%,
-  80%,
-  100% {
-    transform: scale(0.75);
-    opacity: 0.45;
-  }
-
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
 @media (max-width: 640px) {
   :root {
     /* Inter-section gap only exists on mobile. */
@@ -1763,11 +1664,6 @@ h3 {
   .card {
     padding: 24px 20px;
     border-radius: 0px;
-  }
-
-  /* Loading card stays square even though .card rounds on mobile. */
-  .loading-card {
-    border-radius: 0;
   }
 
   .confirmation-page {
@@ -1961,11 +1857,6 @@ h3 {
     height: 63px;
   }
 
-  .landing-accommodation-corner-tr {
-    top: 10px;
-    right: 10px;
-  }
-
   .landing-accommodation-corner-tl {
     top: 10px;
     left: 10px;
@@ -1973,11 +1864,6 @@ h3 {
 
   .landing-accommodation-corner-br {
     right: 10px;
-    bottom: 10px;
-  }
-
-  .landing-accommodation-corner-bl {
-    left: 10px;
     bottom: 10px;
   }
 
@@ -2244,8 +2130,7 @@ h3 {
   }
 
   .landing-scroll-arrow,
-  .landing-dresscode-artwork,
-  .confirmation-loading span {
+  .landing-dresscode-artwork {
     animation: none;
   }
 

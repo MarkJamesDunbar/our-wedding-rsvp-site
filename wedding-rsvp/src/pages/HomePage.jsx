@@ -61,6 +61,7 @@ export default function HomePage() {
             className="landing-timeline-artwork"
             src={timelineDesign}
             alt="Wedding timeline details"
+            loading="lazy"
           />
         </div>
       </section>
@@ -150,7 +151,7 @@ export default function HomePage() {
       </section>
 
       <section className="landing-fifth-panel" aria-label="International guests information section">
-        <img className="landing-international-plane" src={planeDesign} alt="" aria-hidden="true" />
+        <img className="landing-international-plane" src={planeDesign} alt="" aria-hidden="true" loading="lazy" />
         <h2 className="landing-international-title">
           <span className="landing-international-line landing-international-line-top">
             for international
@@ -199,6 +200,7 @@ export default function HomePage() {
           className="landing-accommodation-artwork"
           src={hotelDesign}
           alt="Hotel illustration"
+          loading="lazy"
         />
 
         <h2 className="landing-accommodation-title">accommodation</h2>
@@ -312,6 +314,7 @@ export default function HomePage() {
             className="landing-dresscode-artwork"
             src={dresscodeDesign}
             alt="Dress code illustration of heels and formal shoes"
+            loading="lazy"
           />
 
           <h2 className="landing-dresscode-title">dresscode</h2>
@@ -343,6 +346,7 @@ export default function HomePage() {
           className="landing-useful-artwork"
           src={lightbulbDesign}
           alt="Lightbulb illustration"
+          loading="lazy"
         />
 
         <h2 className="landing-centered-title">
@@ -390,7 +394,7 @@ export default function HomePage() {
       </section>
 
       <section className="landing-accent-panel" aria-label="RSVP reminder section">
-        <img className="landing-accent-artwork" src={rsvpPageDesign} alt="RSVP reminder details" />
+        <img className="landing-accent-artwork" src={rsvpPageDesign} alt="RSVP reminder details" loading="lazy" />
 
         <div className="landing-accent-content">
           <p className="landing-accent-copy">

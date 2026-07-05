@@ -1571,6 +1571,16 @@ h3 {
   text-align: center;
 }
 
+@keyframes circularTextSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .confirmation-crest-bouquet {
   position: absolute;
   top: 50%;

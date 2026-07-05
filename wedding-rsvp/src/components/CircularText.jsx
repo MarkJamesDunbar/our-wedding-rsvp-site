@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 
 const hoverSpeedMap = {
@@ -21,12 +20,11 @@ export default function CircularText({
   const effectiveDuration = isHovered && onHover ? spinDuration * (hoverSpeedMap[onHover] || 1) : spinDuration;
 
   return (
-    <motion.div
+    <div
       className={`circular-text ${className}`.trim()}
-      animate={{ rotate: 360 }}
-      transition={{ repeat: Infinity, ease: 'linear', duration: effectiveDuration }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+      style={{ animation: `circularTextSpin ${effectiveDuration}s linear infinite` }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       aria-hidden="true"
     >
       {characters.map((character, index) => {
@@ -42,6 +40,6 @@ export default function CircularText({
           </span>
         );
       })}
-    </motion.div>
+    </div>
   );
 }

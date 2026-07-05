@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useSearchParams } from 'react-router-dom';
 import ClickSpark from './components/ClickSpark';
 import HomePage from './pages/HomePage';
 import RSVPForm from './pages/RSVPForm';
 import ConfirmationPage from './pages/ConfirmationPage';
-import AdminPortal from './pages/AdminPortal';
 import { courses } from './data/menuOptions';
 import { apiPath } from './config/api';
 import localInvitations from './data/invitations.json';
+
+const AdminPortal = lazy(() => import('./pages/AdminPortal'));
 
 const RESPONSE_STORAGE_PREFIX = 'rsvp-response:';
 
@@ -115,7 +116,14 @@ function AppContent() {
     <div className="app-shell">
       <div className="app-content">
         <Routes>
-          <Route path="/admin" element={<AdminPortal />} />
+          <Route
+            path="/admin"
+            element={
+              <Suspense fallback={null}>
+                <AdminPortal />
+              </Suspense>
+            }
+          />
 
           {!invitationId && !loading && (
             <Route

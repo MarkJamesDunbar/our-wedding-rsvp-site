@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import arrowDesign from '../assets/designs/arrow.png';
-import dresscodeDesign from '../assets/designs/dresscode.svg';
+import dresscodeDesign from '../assets/designs/dresscode.webp';
 import hotelDesign from '../assets/designs/hotel.svg';
 import LandingCarousel from '../components/LandingCarousel';
-import inviteCardDesign from '../assets/designs/invite_card.svg';
+import inviteCardDesign from '../assets/designs/invite_card.webp';
 import lightbulbDesign from '../assets/designs/lightbulb.svg';
 import planeDesign from '../assets/designs/plane.svg';
-import rsvpPageDesign from '../assets/designs/rsvp-page.svg';
+import rsvpPageDesign from '../assets/designs/rsvp-page.webp';
 import timelineDesign from '../assets/designs/timeline-2.svg';
 
 export default function HomePage() {

@@ -334,7 +334,12 @@ h3 {
 
 .landing-hero {
   position: relative;
-  padding: 0 calc(20px + var(--safe-right)) 0 calc(20px + var(--safe-left));
+  /* Two-row grid: the invite card gets all remaining height, the scroll cue
+     is a full-width card pinned to the fold by normal flow — nothing is
+     absolutely positioned, so the pieces can never misalign. */
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  padding: 0;
   overflow: hidden;
   isolation: isolate;
 }
@@ -355,16 +360,17 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 0;
   width: 100%;
-  height: max(0px, calc(var(--snap-page-height) - 54px - var(--safe-bottom)));
-  padding: calc(6px + var(--safe-top)) 0 0;
+  padding: calc(6px + var(--safe-top)) calc(20px + var(--safe-right)) 6px
+    calc(20px + var(--safe-left));
   overflow: visible;
 }
 
 .landing-invite-card {
-  /* Desktop/tablet: fit the card to the available HEIGHT (the wrap is one
-     viewport minus the scroll cue); width follows from the aspect ratio.
-     The ≤640px override switches to the width-driven oversized mobile look. */
+  /* Desktop/tablet: fit the card to the available HEIGHT (the grid row);
+     width follows from the aspect ratio. The ≤640px override switches to the
+     width-driven oversized mobile look. */
   width: auto;
   max-width: 100%;
   height: 100%;
@@ -373,36 +379,28 @@ h3 {
      card art starts clear of the Dynamic Island / notch. */
   transform: translate(0, calc(var(--safe-top) * 0.5));
   transform-origin: center center;
-  filter: drop-shadow(0 20px 32px rgba(44, 31, 28, 0.12));
 }
 
 .landing-scroll-cue {
-  position: absolute;
-  left: 0;
-  right: 0;
-  /* The hero is exactly one viewport tall, so its bottom edge is the fold.
-     Hug it. The safe-area inset is absorbed by the height + padding below. */
-  bottom: 0;
+  /* One full-width card: translucent cream panel holding the script copy and
+     the arrow side by side in normal flow. */
   display: flex;
+  align-items: center;
   justify-content: center;
   width: 100%;
-  height: calc(85px + var(--safe-bottom));
   margin: 0;
-  padding: 0 0 var(--safe-bottom);
+  padding: 14px 16px calc(14px + var(--safe-bottom));
   color: var(--red);
-  /* Solid cream box, semi-transparent so the photo still shows through. */
   background: rgba(247, 235, 219, 0.85);
 }
 
 .landing-scroll-inner {
-  position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .landing-scroll-copy {
-  position: relative;
-  top: -18px;
-  z-index: 1;
   margin: 0;
   text-align: center;
   font-family: var(--font-script);
@@ -415,10 +413,7 @@ h3 {
 }
 
 .landing-scroll-arrow {
-  position: absolute;
-  left: calc(100% - 10px);
-  bottom: 14px;
-  width: 200px;
+  width: clamp(90px, 18vw, 170px);
   height: auto;
   animation: landingArrowDrift 2.8s ease-in-out infinite;
 }
@@ -1700,18 +1695,9 @@ h3 {
     font-size: 1.05rem;
   }
 
-  .landing-hero {
-    padding: 0 calc(12px + var(--safe-right)) 0 calc(12px + var(--safe-left));
-  }
-
-  .landing-hero::before {
-    inset: calc(-1 * var(--safe-top)) calc(-1 * var(--safe-right))
-      calc(-1 * var(--safe-bottom)) calc(-1 * var(--safe-left));
-  }
-
   .landing-card-wrap {
-    height: max(0px, calc(var(--snap-page-height) - 48px - var(--safe-bottom)));
-    padding-top: calc(4px + var(--safe-top));
+    padding: calc(4px + var(--safe-top)) calc(12px + var(--safe-right)) 4px
+      calc(12px + var(--safe-left));
   }
 
   .landing-invite-card {
@@ -1721,24 +1707,11 @@ h3 {
     transform: translate(0, calc(-45px + var(--safe-top) * 0.5));
   }
 
-  .landing-scroll-cue {
-    width: 100%;
-    /* Only grow to 12rem when a safe-area inset exists; otherwise stay 85px. */
-    height: 5.5rem;
-    bottom: 2.5rem;
-    margin: 0;
-    padding: 0 0 max(8px, var(--safe-bottom));
-  }
-
   .landing-scroll-copy {
-    top: 20px;
     font-size: 1.48rem;
   }
 
   .landing-scroll-arrow {
-    left: calc(100% - 15px);
-    /* Only lift to 5.2rem when a safe-area inset exists; otherwise 14px. */
-    bottom: -15px;
     width: 75px;
   }
 

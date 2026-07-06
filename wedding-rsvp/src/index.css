@@ -20,30 +20,26 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
-  /* Every page fills the FULL device height: from the very top of the screen to
-     the very bottom, with the top and bottom safe zones INCLUDED. The page's
-     background bleeds edge-to-edge into those zones, while content is inset with
-     the --safe-* values so it stays in the visible band in the middle. Because
-     each page always covers the whole screen, neighbouring pages can never bleed
-     into view behind Safari's collapsing toolbars. svh is the fallback for
-     engines without large-viewport units. */
+  /* The landing page is an app-like PAGER: `.landing-page` is a fixed-height
+     scroll container (the document itself never scrolls while it's mounted).
+     Because the document doesn't scroll, iOS Safari never collapses its
+     toolbar, so the viewport height is CONSTANT — no lvh/svh mismatch, no
+     mid-scroll resnapping. dvh always equals that stable viewport; svh is the
+     fallback for engines without dynamic units. */
   --app-height: 100svh;
   --snap-page-height: 100svh;
   /* The usable content band between the safe zones (the "100vh" in the middle). */
   --content-height: calc(100svh - var(--safe-top) - var(--safe-bottom));
-  /* Spacer in the SEAM between two full-screen pages. It sits off-screen while a
-     page is snapped into view (scroll-snap-align: start snaps to each section's
-     top edge), so the safe-area overflow of one page can never overlap the next.
-     Only needed on mobile (iOS toolbar overshoot); desktop has no gap. Set to
-     200px in the mobile media query below. */
+  /* Legacy seam between pages — obsolete with the pager (kept at 0 so the
+     seam-fill rules collapse to nothing). */
   --page-gap: 0px;
 }
 
-@supports (height: 100lvh) {
+@supports (height: 100dvh) {
   :root {
-    --app-height: 100lvh;
-    --snap-page-height: 100lvh;
-    --content-height: calc(100lvh - var(--safe-top) - var(--safe-bottom));
+    --app-height: 100dvh;
+    --snap-page-height: 100dvh;
+    --content-height: calc(100dvh - var(--safe-top) - var(--safe-bottom));
   }
 }
 
@@ -67,10 +63,11 @@ body,
 
 html.homepage-snap,
 body.homepage-snap {
-  /* `mandatory` so each page reliably settles to its top. `proximity` felt too
-     weak (pages parked mid-scroll). The slight landing correction is the
-     inherent cost of mandatory's exact alignment. */
-  scroll-snap-type: y mandatory;
+  /* Freeze the document while the landing pager is mounted: `.landing-page`
+     becomes the one and only scroller. On iOS Safari this keeps the toolbar
+     (and therefore the viewport height) completely stable while paging. */
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -324,21 +321,26 @@ h3 {
   background: #8d5b59;
 }
 
+/* The pager: a fixed-height snap container. One swipe/wheel gesture moves
+   exactly one page (`scroll-snap-stop: always` forbids flying past pages).
+   `overscroll-behavior` stops the gesture from chaining/rubber-banding into
+   the (frozen) document behind it. */
+.landing-page {
+  height: var(--snap-page-height);
+  overflow-y: auto;
+  overflow-x: clip;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 .landing-page > section {
-  /* Each page must equal the snapport (viewport) EXACTLY in every toolbar
-     state, or mandatory snapping misbehaves:
-       - lvh is taller than the viewport while Safari's toolbar is showing, so
-         the browser relaxes snapping and parks you mid-page.
-       - svh is shorter than the viewport once the toolbar collapses, so the
-         page no longer fills the screen and snap can align the bottom, not the
-         top.
-     dvh is the *dynamic* viewport: it always equals the current viewport, so at
-     rest each page is exactly one screen tall and `start` snaps cleanly to the
-     page top both up and down. The 200px --page-gap stays as the seam between
-     pages. vh is the fallback for engines without dvh. */
-  height: 100vh;
-  height: 100dvh;
+  /* Each page is exactly one pager-viewport tall. The pager's height never
+     changes on iOS (the toolbar can't collapse while the document is frozen),
+     so snapping is exact in both directions and every toolbar state. */
+  height: 100%;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 /* Gap between consecutive pages. `scroll-snap-align: start` keeps snapping to
@@ -397,10 +399,16 @@ h3 {
 }
 
 .landing-invite-card {
-  width: 100%;
+  /* Desktop/tablet: fit the card to the available HEIGHT (the wrap is one
+     viewport minus the scroll cue); width follows from the aspect ratio.
+     The ≤640px override switches to the width-driven oversized mobile look. */
+  width: auto;
   max-width: 100%;
-  height: auto;
-  transform: translate(0, -90px);
+  height: 100%;
+  object-fit: contain;
+  /* On notched devices (safe-top > 0) ease the card down half an inset so the
+     card art starts clear of the Dynamic Island / notch. */
+  transform: translate(0, calc(var(--safe-top) * 0.5));
   transform-origin: center center;
   filter: drop-shadow(0 20px 32px rgba(44, 31, 28, 0.12));
 }
@@ -516,7 +524,9 @@ h3 {
 
 .landing-carousel-mask {
   width: 100%;
-  transform: translateY(-50px);
+  /* Optically recenter the strip inside the visible band between unequal
+     safe-area insets (shifts down by half the top/bottom inset difference). */
+  transform: translateY(calc(-50px + (var(--safe-top) - var(--safe-bottom)) / 2));
 }
 
 .landing-carousel-track {
@@ -761,8 +771,12 @@ h3 {
 /* Give the "useful things to know" page a little extra length so its content
    isn't cramped against the bottom edge. */
 .landing-page > section.landing-eighth-panel {
-  height: calc(100vh + 40px);
-  height: calc(100dvh + 40px);
+  height: calc(100% + 40px);
+  /* The panel is 40px taller than the snapport, which makes the snap engine
+     add a second, bottom-aligned snap position — scrolling UP then stopped
+     40px below the panel top. Trimming the snap AREA (not the box) by the
+     same 40px collapses both snap positions onto the panel top. */
+  scroll-margin-bottom: -40px;
 }
 
 /* Filler below the final page so the overscroll/safe area lands on the green
@@ -781,6 +795,18 @@ h3 {
   width: 100%;
   max-width: none;
   height: auto;
+}
+
+/* Desktop/tablet: the width-driven artwork grows far taller than the panel and
+   (with the panel's visible overflow) bled over the section above. Pin it to
+   the panel box and crop with `cover` instead. */
+@media (min-width: 641px) {
+  .landing-accent-artwork {
+    inset: 0;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+  }
 }
 
 .landing-accent-content {
@@ -1189,9 +1215,12 @@ h3 {
 }
 
 .landing-timeline-line-top {
+  /* Anchor the cascade to the CENTER column so it stays attached to the
+     artwork on wide screens (a fixed left offset drifted to the far corner). */
   top: calc(38px + var(--safe-top));
-  left: calc(76px + var(--safe-left));
+  left: 50%;
   font-size: 2.85rem;
+  transform: translateX(-105%);
 }
 
 .landing-timeline-line-bottom {
@@ -1205,13 +1234,15 @@ h3 {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: calc(168px + var(--safe-top)) 28px 0;
+  /* Bottom clearance lifts the bottom-anchored artwork above the home
+     indicator when a safe-area inset is present. */
+  padding: calc(168px + var(--safe-top)) 28px var(--safe-bottom);
 }
 
 .landing-timeline-artwork {
   width: min(100%, 760px);
   height: 720px;
-  max-height: calc(var(--snap-page-height) - 168px - var(--safe-top));
+  max-height: calc(var(--snap-page-height) - 168px - var(--safe-top) - var(--safe-bottom));
   object-fit: contain;
   object-position: bottom center;
 }
@@ -1662,11 +1693,6 @@ h3 {
 }
 
 @media (max-width: 640px) {
-  :root {
-    /* Inter-section gap only exists on mobile. */
-    --page-gap: 200px;
-  }
-
   h1 {
     font-size: 2.1rem;
   }
@@ -1710,7 +1736,8 @@ h3 {
   .landing-invite-card {
     width: 120%;
     max-width: 130%;
-    transform: translate(0, -45px);
+    height: auto;
+    transform: translate(0, calc(-45px + var(--safe-top) * 0.5));
   }
 
   .landing-scroll-cue {
@@ -2060,6 +2087,7 @@ h3 {
     top: calc(44px + var(--safe-top));
     left: calc(44px + var(--safe-left));
     font-size: 2.05rem;
+    transform: none;
   }
 
   .landing-timeline-line-bottom {
@@ -2134,8 +2162,7 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.homepage-snap,
-  body.homepage-snap {
+  .landing-page {
     scroll-snap-type: none;
   }
 

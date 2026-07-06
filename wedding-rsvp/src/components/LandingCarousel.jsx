@@ -154,9 +154,15 @@ export default function LandingCarousel() {
   }, []);
 
   useEffect(() => {
+    // The landing page is a fixed-height pager (`.landing-page` scrolls, not
+    // the window), so scroll-linked drift listens to the pager element.
+    const pager = sectionRef.current?.closest('.landing-page');
+    const scrollTarget = pager || window;
+    const readScroll = () => (pager ? pager.scrollTop : window.scrollY);
+
     const handlePageScroll = () => {
       const section = sectionRef.current;
-      const nextScrollY = window.scrollY;
+      const nextScrollY = readScroll();
       const deltaY = nextScrollY - lastWindowScrollYRef.current;
 
       lastWindowScrollYRef.current = nextScrollY;
@@ -181,11 +187,11 @@ export default function LandingCarousel() {
       );
     };
 
-    lastWindowScrollYRef.current = window.scrollY;
-    window.addEventListener('scroll', handlePageScroll, { passive: true });
+    lastWindowScrollYRef.current = readScroll();
+    scrollTarget.addEventListener('scroll', handlePageScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', handlePageScroll);
+      scrollTarget.removeEventListener('scroll', handlePageScroll);
     };
   }, []);
 

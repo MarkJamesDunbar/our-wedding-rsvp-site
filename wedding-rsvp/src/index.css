@@ -335,23 +335,23 @@ h3 {
 .landing-hero {
   position: relative;
   /* Two-row grid: the invite card gets all remaining height, the scroll cue
-     is a full-width card pinned to the fold by normal flow — nothing is
-     absolutely positioned, so the pieces can never misalign. */
+     is a full-width card floated just above the fold by normal flow — nothing
+     is absolutely positioned, so the pieces can never misalign. Overflow stays
+     visible so the photo backdrop can bleed past the page edges. */
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   padding: 0;
-  overflow: hidden;
   isolation: isolate;
 }
 
 .landing-hero::before {
   content: '';
   position: absolute;
-  /* Bleed the photo out past every edge into the safe zones. When iOS reports
-     real insets (viewport-fit=cover engaged) the photo extends under the notch
-     and home bar; when it reports 0 the negatives collapse to inset:0. */
-  inset: calc(-1 * var(--safe-top)) calc(-1 * var(--safe-right))
-    calc(-1 * var(--safe-bottom)) calc(-1 * var(--safe-left));
+  /* Bleed the photo past every edge — 40px beyond the page top/bottom plus the
+     safe-area insets — so it extends above and below the page (visible during
+     overscroll and under the notch/home bar once cover engages). */
+  inset: calc(-40px - var(--safe-top)) calc(-1 * var(--safe-right))
+    calc(-40px - var(--safe-bottom)) calc(-1 * var(--safe-left));
   z-index: -2;
   background: url('./assets/engagement_images/markdunbar-2-bw.webp') center center / cover no-repeat;
 }
@@ -383,13 +383,13 @@ h3 {
 
 .landing-scroll-cue {
   /* One full-width card: translucent cream panel holding the script copy and
-     the arrow side by side in normal flow. */
+     the arrow side by side in normal flow. Slim, floated above the fold. */
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin: 0;
-  padding: 14px 16px calc(14px + var(--safe-bottom));
+  margin: 0 0 calc(18px + var(--safe-bottom));
+  padding: 6px 16px;
   color: var(--red);
   background: rgba(247, 235, 219, 0.85);
 }
@@ -404,7 +404,7 @@ h3 {
   margin: 0;
   text-align: center;
   font-family: var(--font-script);
-  font-size: 1.95rem;
+  font-size: 1.5rem;
   line-height: 0.9;
 }
 
@@ -413,7 +413,7 @@ h3 {
 }
 
 .landing-scroll-arrow {
-  width: clamp(90px, 18vw, 170px);
+  width: clamp(64px, 12vw, 120px);
   height: auto;
   animation: landingArrowDrift 2.8s ease-in-out infinite;
 }
@@ -1708,11 +1708,11 @@ h3 {
   }
 
   .landing-scroll-copy {
-    font-size: 1.48rem;
+    font-size: 1.25rem;
   }
 
   .landing-scroll-arrow {
-    width: 75px;
+    width: 56px;
   }
 
   .landing-carousel-panel {

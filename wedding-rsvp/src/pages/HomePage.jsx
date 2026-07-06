@@ -14,27 +14,14 @@ export default function HomePage() {
   const location = useLocation();
 
   useEffect(() => {
-    document.documentElement.classList.add('homepage-snap');
-    document.body.classList.add('homepage-snap');
-
-    return () => {
-      document.documentElement.classList.remove('homepage-snap');
-      document.body.classList.remove('homepage-snap');
-    };
-  }, []);
-
-  useEffect(() => {
     // iOS Safari paints the notch/home-indicator zones with the BODY
-    // background colour (theme-color for the top zone on iOS 15+). Sync both
-    // to the currently snapped panel so its background appears to extend into
-    // the insets on every page. Panels without a data-inset-color are cream.
+    // background colour (theme-color for the top zone on iOS 15+) while its
+    // toolbar is expanded; once the toolbar collapses, actual page content
+    // extends under the insets. Sync the colour to the most-visible panel so
+    // the pre-collapse state matches each page. Panels without a
+    // data-inset-color are cream.
     const DEFAULT_INSET_COLOR = '#f7ebdb';
-    const pager = document.querySelector('.landing-page');
     const themeMeta = document.querySelector('meta[name="theme-color"]');
-
-    if (!pager) {
-      return undefined;
-    }
 
     const applyColor = (color) => {
       document.body.style.backgroundColor = color;
@@ -49,10 +36,12 @@ export default function HomePage() {
           }
         }
       },
-      { root: pager, threshold: 0.55 }
+      { threshold: 0.55 }
     );
 
-    pager.querySelectorAll(':scope > section').forEach((section) => observer.observe(section));
+    document
+      .querySelectorAll('.landing-page > section')
+      .forEach((section) => observer.observe(section));
 
     return () => {
       observer.disconnect();

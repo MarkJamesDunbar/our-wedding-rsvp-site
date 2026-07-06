@@ -61,15 +61,6 @@ body,
   overflow-x: clip;
 }
 
-html.homepage-snap,
-body.homepage-snap {
-  /* Freeze the document while the landing pager is mounted: `.landing-page`
-     becomes the one and only scroller. On iOS Safari this keeps the toolbar
-     (and therefore the viewport height) completely stable while paging. */
-  height: 100%;
-  overflow: hidden;
-}
-
 body {
   /*
    * Use `clip`, NOT `hidden`. `overflow-x: hidden` forces `overflow-y` to
@@ -324,26 +315,14 @@ h3 {
   background: #8d5b59;
 }
 
-/* The pager: a fixed-height snap container. One swipe/wheel gesture moves
-   exactly one page (`scroll-snap-stop: always` forbids flying past pages).
-   `overscroll-behavior` stops the gesture from chaining/rubber-banding into
-   the (frozen) document behind it. */
-.landing-page {
-  height: var(--snap-page-height);
-  overflow-y: auto;
-  overflow-x: clip;
-  scroll-snap-type: y mandatory;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
+/* The landing page scrolls the DOCUMENT naturally (no snap, no inner
+   scroller). This lets iOS Safari collapse its toolbar on scroll, which
+   engages viewport-fit=cover so page content extends (blurred) under the
+   notch and home indicator — the system inset effect. */
 .landing-page > section {
-  /* Each page is exactly one pager-viewport tall. The pager's height never
-     changes on iOS (the toolbar can't collapse while the document is frozen),
-     so snapping is exact in both directions and every toolbar state. */
-  height: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  /* Each page is one viewport tall; dvh tracks the toolbar state smoothly. */
+  height: 100vh;
+  height: 100dvh;
 }
 
 /* Gap between consecutive pages. `scroll-snap-align: start` keeps snapping to
@@ -785,12 +764,8 @@ h3 {
 /* Give the "useful things to know" page a little extra length so its content
    isn't cramped against the bottom edge. */
 .landing-page > section.landing-eighth-panel {
-  height: calc(100% + 40px);
-  /* The panel is 40px taller than the snapport, which makes the snap engine
-     add a second, bottom-aligned snap position — scrolling UP then stopped
-     40px below the panel top. Trimming the snap AREA (not the box) by the
-     same 40px collapses both snap positions onto the panel top. */
-  scroll-margin-bottom: -40px;
+  height: calc(100vh + 40px);
+  height: calc(100dvh + 40px);
 }
 
 /* Filler below the final page so the overscroll/safe area lands on the green
@@ -2167,10 +2142,6 @@ h3 {
 /* Short desktop/laptop windows are handled by the vh-fluid sizes above. */
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-page {
-    scroll-snap-type: none;
-  }
-
   .landing-scroll-arrow,
   .landing-dresscode-artwork {
     animation: none;

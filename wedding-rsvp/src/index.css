@@ -27,9 +27,10 @@
   --snap-page-height: 100svh;
   /* The usable content band between the safe zones (the "100vh" in the middle). */
   --content-height: calc(100svh - var(--safe-top) - var(--safe-bottom));
-  /* Legacy seam between pages — obsolete (kept at 0 so the seam-fill rules
-     collapse to nothing). */
-  --page-gap: 0px;
+  /* Breathing space between pages: one inset-pair tall (top + bottom safe
+     zones), so a page's bottom content clears the home bar before the next
+     page's top reaches the notch. Collapses to 0 on inset-less devices. */
+  --page-gap: calc(var(--safe-top) + var(--safe-bottom));
 }
 
 *,

@@ -438,7 +438,7 @@ h3 {
   top: 0;
   bottom: 0;
   margin: auto 0;
-  width: clamp(44px, 8vw, 72px);
+  width: clamp(36px, 6vw, 56px);
   height: fit-content;
   animation: landingArrowDrift 2.8s ease-in-out infinite;
 }
@@ -579,7 +579,7 @@ h3 {
   padding: calc(38px + var(--safe-top)) calc(28px + var(--safe-right))
     calc(230px + var(--safe-bottom)) calc(28px + var(--safe-left));
   /* background: var(--page-bg); */
-  background: url('./assets/designs/waverley.webp') center bottom / min(100%, 980px) auto no-repeat;
+  background: var(--page-bg) url('./assets/designs/waverley.webp') center bottom / min(100%, 980px) auto no-repeat;
   isolation: isolate;
   overflow: hidden;
 }
@@ -1725,7 +1725,7 @@ h3 {
   }
 
   .landing-scroll-arrow {
-    width: 40px;
+    width: 32px;
   }
 
   .landing-carousel-panel {

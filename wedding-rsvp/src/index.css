@@ -579,7 +579,7 @@ h3 {
   padding: calc(38px + var(--safe-top)) calc(28px + var(--safe-right))
     calc(230px + var(--safe-bottom)) calc(28px + var(--safe-left));
   /* background: var(--page-bg); */
-  background: var(--page-bg) url('./assets/designs/waverley.webp') center bottom / min(100%, 980px) auto no-repeat;
+  background: var(--page-bg) url('./assets/designs/waverley.webp') center bottom / 100% auto no-repeat;
   isolation: isolate;
   overflow: hidden;
 }

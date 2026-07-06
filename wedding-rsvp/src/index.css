@@ -310,9 +310,9 @@ h3 {
    engages viewport-fit=cover so page content extends (blurred) under the
    notch and home indicator — the system inset effect. */
 .landing-page {
-  /* Paints the inter-page gaps solid cream, independent of the body colour
-     (which is synced to the current panel for the inset zones). */
-  background: var(--page-bg);
+  /* Paints the inter-page gaps. DEV: green so the spacers are visible while
+     tuning — revert to var(--page-bg) for the real cream. */
+  background: mediumseagreen;
 }
 
 .landing-page > section {
@@ -343,11 +343,11 @@ h3 {
 .landing-hero::before {
   content: '';
   position: absolute;
-  /* Bleed the photo past every edge — 40px beyond the page top/bottom plus the
-     safe-area insets — so it extends above and below the page (visible during
-     overscroll and under the notch/home bar once cover engages). */
+  /* Bleed the photo past the top (40px + inset, for overscroll and the notch
+     once cover engages) but STOP at the page bottom — the scroll cue sits
+     flush with the page edge alongside the photo's bottom edge. */
   inset: calc(-40px - var(--safe-top)) calc(-1 * var(--safe-right))
-    calc(-40px - var(--safe-bottom)) calc(-1 * var(--safe-left));
+    calc(-1 * var(--safe-bottom)) calc(-1 * var(--safe-left));
   z-index: -2;
   background: url('./assets/engagement_images/markdunbar-2-bw.webp') center center / cover no-repeat;
 }
@@ -357,7 +357,7 @@ h3 {
   position: absolute;
   /* Same bleed as the photo so the fade reaches the physical screen top. */
   inset: calc(-40px - var(--safe-top)) calc(-1 * var(--safe-right))
-    calc(-40px - var(--safe-bottom)) calc(-1 * var(--safe-left));
+    calc(-1 * var(--safe-bottom)) calc(-1 * var(--safe-left));
   z-index: -1;
   pointer-events: none;
   /* Fade the photo up into the inset colour (#bababa — the hero's synced body
@@ -438,7 +438,7 @@ h3 {
   top: 0;
   bottom: 0;
   margin: auto 0;
-  width: clamp(72px, 14vw, 130px);
+  width: clamp(44px, 8vw, 72px);
   height: fit-content;
   animation: landingArrowDrift 2.8s ease-in-out infinite;
 }
@@ -1725,7 +1725,7 @@ h3 {
   }
 
   .landing-scroll-arrow {
-    width: 64px;
+    width: 40px;
   }
 
   .landing-carousel-panel {

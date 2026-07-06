@@ -81,6 +81,9 @@ body {
    */
   overflow-x: clip;
   background: var(--page-bg);
+  /* The snapped-panel observer retints this to match the current page; the
+     tint fills iOS's safe-area zones, so ease between tones. */
+  transition: background-color 320ms ease;
   color: var(--text);
   font-family: var(--font-serif);
   font-size: 1.3rem;

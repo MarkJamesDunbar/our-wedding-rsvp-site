@@ -23,6 +23,44 @@ export default function HomePage() {
     };
   }, []);
 
+  useEffect(() => {
+    // iOS Safari paints the notch/home-indicator zones with the BODY
+    // background colour (theme-color for the top zone on iOS 15+). Sync both
+    // to the currently snapped panel so its background appears to extend into
+    // the insets on every page. Panels without a data-inset-color are cream.
+    const DEFAULT_INSET_COLOR = '#f7ebdb';
+    const pager = document.querySelector('.landing-page');
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+
+    if (!pager) {
+      return undefined;
+    }
+
+    const applyColor = (color) => {
+      document.body.style.backgroundColor = color;
+      themeMeta?.setAttribute('content', color);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            applyColor(entry.target.dataset.insetColor || DEFAULT_INSET_COLOR);
+          }
+        }
+      },
+      { root: pager, threshold: 0.55 }
+    );
+
+    pager.querySelectorAll(':scope > section').forEach((section) => observer.observe(section));
+
+    return () => {
+      observer.disconnect();
+      document.body.style.backgroundColor = '';
+      themeMeta?.setAttribute('content', DEFAULT_INSET_COLOR);
+    };
+  }, []);
+
   const rsvpPath = location.pathname.startsWith('/invite') ? '/invite/rsvp' : '/rsvp';
   const rsvpHref = `${rsvpPath}${location.search}`;
 
@@ -149,7 +187,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="landing-fifth-panel" aria-label="International guests information section">
+      <section
+        className="landing-fifth-panel"
+        aria-label="International guests information section"
+        data-inset-color="#becbbb"
+      >
         <img className="landing-international-plane" src={planeDesign} alt="" aria-hidden="true" loading="lazy" />
         <h2 className="landing-international-title">
           <span className="landing-international-line landing-international-line-top">
@@ -194,7 +236,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="landing-sixth-panel" aria-label="Accommodation section">
+      <section
+        className="landing-sixth-panel"
+        aria-label="Accommodation section"
+        data-inset-color="#c6cfcb"
+      >
         <img
           className="landing-accommodation-artwork"
           src={hotelDesign}
@@ -392,7 +438,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="landing-accent-panel" aria-label="RSVP reminder section">
+      <section
+        className="landing-accent-panel"
+        aria-label="RSVP reminder section"
+        data-inset-color="#e0eae6"
+      >
         <img className="landing-accent-artwork" src={rsvpPageDesign} alt="RSVP reminder details" loading="lazy" />
 
         <div className="landing-accent-content">

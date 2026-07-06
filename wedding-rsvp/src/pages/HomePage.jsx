@@ -12,6 +12,7 @@ import timelineDesign from '../assets/designs/timeline-2.svg';
 
 export default function HomePage() {
   const location = useLocation();
+  const renderGap = (key) => <div key={key} className="landing-page-gap" aria-hidden="true" />;
 
   useEffect(() => {
     // iOS Safari paints the notch/home-indicator zones with the BODY
@@ -40,7 +41,7 @@ export default function HomePage() {
     );
 
     document
-      .querySelectorAll('.landing-page > section')
+      .querySelectorAll('.landing-page > section[data-inset-color], .landing-page > section:not([data-inset-color])')
       .forEach((section) => observer.observe(section));
 
     return () => {
@@ -79,7 +80,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {renderGap('gap-hero-carousel')}
+
       <LandingCarousel />
+
+      {renderGap('gap-carousel-timeline')}
 
       <section className="landing-third-panel" aria-label="Wedding timeline section">
         <h2 className="landing-timeline-title">
@@ -96,6 +101,8 @@ export default function HomePage() {
           />
         </div>
       </section>
+
+      {renderGap('gap-timeline-travel')}
 
       <section className="landing-fourth-panel" aria-label="Travel information section">
         <h2 className="landing-travel-title">
@@ -180,6 +187,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      {renderGap('gap-travel-international')}
+
       <section
         className="landing-fifth-panel"
         aria-label="International guests information section"
@@ -228,6 +237,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {renderGap('gap-international-accommodation')}
 
       <section
         className="landing-sixth-panel"
@@ -346,6 +357,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      {renderGap('gap-accommodation-dresscode')}
+
       <section className="landing-seventh-panel" aria-label="Dress code section">
         <div className="landing-dresscode-content">
           <img
@@ -378,6 +391,8 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      {renderGap('gap-dresscode-useful')}
 
       <section className="landing-eighth-panel" aria-label="Useful things to know section">
         <img
@@ -431,6 +446,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      {renderGap('gap-useful-accent')}
+
       <section
         className="landing-accent-panel"
         aria-label="RSVP reminder section"
@@ -452,8 +469,6 @@ export default function HomePage() {
           <p className="landing-accent-deadline">rsvp by 31 Aug 2026</p>
         </div>
       </section>
-
-      <div className="landing-page-tail" aria-hidden="true" />
     </div>
   );
 }

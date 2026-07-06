@@ -27,10 +27,12 @@
   --snap-page-height: 100svh;
   /* The usable content band between the safe zones (the "100vh" in the middle). */
   --content-height: calc(100svh - var(--safe-top) - var(--safe-bottom));
-  /* Breathing space between pages. Fixed size — env() insets report 0 until
-     the iOS toolbar first collapses, so they can't be trusted for layout; 96px
-     ≈ one notch + home-indicator pair and never jumps. */
-  --page-gap: max(96px, calc(var(--safe-top) + var(--safe-bottom)));
+        /* Breathing space between pages. Keep the top and bottom portions explicit
+          so the seam can show where each safe-area chunk sits, even before iOS
+          reports env() values. The user wants one extra top-inset height added. */
+      --page-gap-top: max(59px, var(--safe-top));
+      --page-gap-bottom: max(34px, var(--safe-bottom));
+        --page-gap: calc(var(--page-gap-top) + var(--page-gap-top) + var(--page-gap-bottom));
 }
 
 *,
@@ -49,6 +51,10 @@ body,
      page is never sideways-scrollable. `clip` keeps the document as the
      vertical scroller, preserving iOS toolbar collapse + safe areas. */
   overflow-x: clip;
+}
+
+html {
+  scroll-snap-type: y mandatory;
 }
 
 body {
@@ -319,13 +325,26 @@ h3 {
   /* One stable viewport tall (svh doesn't animate with the toolbar). */
   height: 100vh;
   height: 100svh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
-/* Gap between consecutive pages. `scroll-snap-align: start` keeps snapping to
-   each section's top edge, so this margin lives entirely in the seam and is
-   never visible at rest — it just stops adjacent pages from overlapping. */
-.landing-page > section:not(:last-child) {
-  margin-bottom: var(--page-gap);
+.landing-page-gap {
+  position: relative;
+  height: var(--page-gap);
+  flex: 0 0 var(--page-gap);
+  background: mediumseagreen;
+  pointer-events: none;
+  scroll-snap-align: none;
+}
+
+.landing-page-gap::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: calc(var(--page-gap-top) + var(--page-gap-bottom));
+  border-top: 2px dotted rgba(247, 235, 219, 0.95);
 }
 
 .landing-hero {
@@ -579,7 +598,7 @@ h3 {
   padding: calc(38px + var(--safe-top)) calc(28px + var(--safe-right))
     calc(230px + var(--safe-bottom)) calc(28px + var(--safe-left));
   /* background: var(--page-bg); */
-  background: var(--page-bg) url('./assets/designs/waverley.webp') center bottom / 100% auto no-repeat;
+  background: var(--page-bg) url('./assets/designs/waverley.webp') center bottom / min(100%, 980px) auto no-repeat;
   isolation: isolate;
   overflow: hidden;
 }
@@ -741,7 +760,7 @@ h3 {
 .landing-accent-panel {
   position: relative;
   background: #e0eae6;
-  overflow: visible;
+  overflow: clip;
 }
 
 /* The tail directly follows the last page, so drop the page-gap that would
@@ -757,32 +776,22 @@ h3 {
   height: calc(100svh + 40px);
 }
 
-/* Filler below the final page so the overscroll/safe area lands on the green
-   instead of the cream page background, and bleeding sections have a backdrop. */
-.landing-page-tail {
-  height: 200px;
-  background: #e0eae6;
-}
-
 .landing-accent-artwork {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -100px;
+  inset: 0;
   z-index: 0;
   width: 100%;
   max-width: none;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 85%;
+  transform: translateY(calc(-1 * var(--safe-bottom)));
 }
 
-/* Desktop/tablet: the width-driven artwork grows far taller than the panel and
-   (with the panel's visible overflow) bled over the section above. Pin it to
-   the panel box and crop with `cover` instead. */
+/* Desktop/tablet: keep the crop slightly higher so more of the design sits
+   behind the RSVP copy while still staying inside the final panel box. */
 @media (min-width: 641px) {
   .landing-accent-artwork {
-    inset: 0;
-    height: 100%;
-    object-fit: cover;
     object-position: center 30%;
   }
 }
@@ -1725,7 +1734,7 @@ h3 {
   }
 
   .landing-scroll-arrow {
-    width: 32px;
+    height: 4rem;;
   }
 
   .landing-carousel-panel {

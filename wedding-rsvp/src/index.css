@@ -20,27 +20,16 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
-  /* The landing page is an app-like PAGER: `.landing-page` is a fixed-height
-     scroll container (the document itself never scrolls while it's mounted).
-     Because the document doesn't scroll, iOS Safari never collapses its
-     toolbar, so the viewport height is CONSTANT — no lvh/svh mismatch, no
-     mid-scroll resnapping. dvh always equals that stable viewport; svh is the
-     fallback for engines without dynamic units. */
+  /* The landing page scrolls the document naturally. Heights use svh (the
+     toolbar-EXPANDED viewport): unlike dvh they never animate when iOS shows
+     or hides its toolbar, so sections don't visibly stretch mid-scroll. */
   --app-height: 100svh;
   --snap-page-height: 100svh;
   /* The usable content band between the safe zones (the "100vh" in the middle). */
   --content-height: calc(100svh - var(--safe-top) - var(--safe-bottom));
-  /* Legacy seam between pages — obsolete with the pager (kept at 0 so the
-     seam-fill rules collapse to nothing). */
+  /* Legacy seam between pages — obsolete (kept at 0 so the seam-fill rules
+     collapse to nothing). */
   --page-gap: 0px;
-}
-
-@supports (height: 100dvh) {
-  :root {
-    --app-height: 100dvh;
-    --snap-page-height: 100dvh;
-    --content-height: calc(100dvh - var(--safe-top) - var(--safe-bottom));
-  }
 }
 
 *,
@@ -320,9 +309,9 @@ h3 {
    engages viewport-fit=cover so page content extends (blurred) under the
    notch and home indicator — the system inset effect. */
 .landing-page > section {
-  /* Each page is one viewport tall; dvh tracks the toolbar state smoothly. */
+  /* One stable viewport tall (svh doesn't animate with the toolbar). */
   height: 100vh;
-  height: 100dvh;
+  height: 100svh;
 }
 
 /* Gap between consecutive pages. `scroll-snap-align: start` keeps snapping to
@@ -356,6 +345,23 @@ h3 {
   background: url('./assets/engagement_images/markdunbar-2-bw.webp') center center / cover no-repeat;
 }
 
+.landing-hero::after {
+  content: '';
+  position: absolute;
+  /* Same bleed as the photo so the fade reaches the physical screen top. */
+  inset: calc(-40px - var(--safe-top)) calc(-1 * var(--safe-right))
+    calc(-40px - var(--safe-bottom)) calc(-1 * var(--safe-left));
+  z-index: -1;
+  pointer-events: none;
+  /* Fade the photo up into the inset colour (#bababa — the hero's synced body
+     background) so the status-bar zone blends seamlessly before any scroll. */
+  background: linear-gradient(
+    to bottom,
+    #bababa 0,
+    rgba(186, 186, 186, 0) calc(40px + var(--safe-top) + 72px)
+  );
+}
+
 .landing-card-wrap {
   display: flex;
   align-items: center;
@@ -382,22 +388,28 @@ h3 {
 }
 
 .landing-scroll-cue {
-  /* One full-width card: translucent cream panel holding the script copy and
-     the arrow side by side in normal flow. Slim, floated above the fold. */
+  /* Full-width card flush with the page bottom. Fades from the translucent
+     cream at its top into the solid inset colour at the bottom, so it melts
+     into the home-indicator zone below. */
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin: 0 0 calc(18px + var(--safe-bottom));
-  padding: 6px 16px;
+  margin: 0;
+  padding: 8px 16px calc(10px + var(--safe-bottom));
   color: var(--red);
-  background: rgba(247, 235, 219, 0.85);
+  background: linear-gradient(
+    to bottom,
+    rgba(247, 235, 219, 0.85) 0,
+    rgba(247, 235, 219, 0.92) 45%,
+    #bababa 100%
+  );
 }
 
 .landing-scroll-inner {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .landing-scroll-copy {
@@ -413,8 +425,16 @@ h3 {
 }
 
 .landing-scroll-arrow {
-  width: clamp(64px, 12vw, 120px);
-  height: auto;
+  /* Out of flow so its size never fattens the cue — it may overflow the card.
+     Centered with auto margins (not transform) because the drift animation
+     owns the transform property. */
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  width: clamp(72px, 14vw, 130px);
+  height: fit-content;
   animation: landingArrowDrift 2.8s ease-in-out infinite;
 }
 
@@ -741,7 +761,7 @@ h3 {
    isn't cramped against the bottom edge. */
 .landing-page > section.landing-eighth-panel {
   height: calc(100vh + 40px);
-  height: calc(100dvh + 40px);
+  height: calc(100svh + 40px);
 }
 
 /* Filler below the final page so the overscroll/safe area lands on the green
@@ -1712,7 +1732,7 @@ h3 {
   }
 
   .landing-scroll-arrow {
-    width: 56px;
+    width: 64px;
   }
 
   .landing-carousel-panel {

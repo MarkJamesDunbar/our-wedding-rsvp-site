@@ -55,7 +55,11 @@ export default function HomePage() {
 
   return (
     <div className="page landing-page">
-      <section className="landing-hero" aria-label="Wedding invitation hero">
+      <section
+        className="landing-hero"
+        aria-label="Wedding invitation hero"
+        data-inset-color="#bababa"
+      >
         <div className="landing-card-wrap">
           <img
             className="landing-invite-card"

@@ -349,25 +349,6 @@ h3 {
     calc(-1 * var(--safe-bottom)) calc(-1 * var(--safe-left));
   z-index: -2;
   background: url('./assets/engagement_images/markdunbar-2-bw.webp') center center / cover no-repeat;
-  transform: scale(1.2);
-}
-
-.landing-hero::after {
-  content: '';
-  position: absolute;
-  /* Extend past the top/bottom edges so the cream fade reaches into the safe
-     zones that Safari paints with the page background colour. */
-  inset: calc(-1 * var(--safe-top)) 0 calc(-1 * var(--safe-bottom));
-  z-index: -1;
-  /* Soft cream fade at the very top so the photo melts into the cream that
-     fills the status-bar area. No overall film over the photo. */
-  background:
-    linear-gradient(
-      to bottom,
-      var(--page-bg) 0,
-      rgba(247, 235, 219, 0) calc(var(--safe-top) + 72px),
-      rgba(247, 235, 219, 0) 100%
-    );
 }
 
 .landing-card-wrap {

@@ -85,8 +85,7 @@ export default function HomePage() {
                 Mount Stuart
               </a>{' '}
               on the Isle of Bute, Scotland. To reach us, you will need to take the
-              ferry from Wemyss Bay to Rothesay. The ferry takes both cars and
-              pedestrians, and is ~35 minutes.
+              ferry from Wemyss Bay to Rothesay.
             </p>
           </section>
 
@@ -110,7 +109,7 @@ export default function HomePage() {
                 rel="noreferrer"
               >
                 Wemyss Bay station
-              </a>
+              </a>{' '}
               (connected to the ferry terminal).
             </p>
           </section>
@@ -370,7 +369,7 @@ export default function HomePage() {
             <p className="landing-useful-stop-body">
               Signal on the Isle of Bute can be patchy in places, particularly outside Rothesay.
               We recommend downloading any maps, ferry tickets, or accommodation confirmations to
-              your phone before you travel – and letting someone know your plans!
+              your phone before you travel!
             </p>
           </section>
 

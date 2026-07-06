@@ -27,10 +27,10 @@
   --snap-page-height: 100svh;
   /* The usable content band between the safe zones (the "100vh" in the middle). */
   --content-height: calc(100svh - var(--safe-top) - var(--safe-bottom));
-  /* Breathing space between pages: one inset-pair tall (top + bottom safe
-     zones), so a page's bottom content clears the home bar before the next
-     page's top reaches the notch. Collapses to 0 on inset-less devices. */
-  --page-gap: calc(var(--safe-top) + var(--safe-bottom));
+  /* Breathing space between pages. Fixed size — env() insets report 0 until
+     the iOS toolbar first collapses, so they can't be trusted for layout; 96px
+     ≈ one notch + home-indicator pair and never jumps. */
+  --page-gap: max(96px, calc(var(--safe-top) + var(--safe-bottom)));
 }
 
 *,
@@ -309,6 +309,12 @@ h3 {
    scroller). This lets iOS Safari collapse its toolbar on scroll, which
    engages viewport-fit=cover so page content extends (blurred) under the
    notch and home indicator — the system inset effect. */
+.landing-page {
+  /* Paints the inter-page gaps solid cream, independent of the body colour
+     (which is synced to the current panel for the inset zones). */
+  background: var(--page-bg);
+}
+
 .landing-page > section {
   /* One stable viewport tall (svh doesn't animate with the toolbar). */
   height: 100vh;
@@ -603,7 +609,6 @@ h3 {
 }
 
 .landing-eighth-panel {
-  /* Panel itself is the regular cream; the blue lives in the gap below it. */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -611,17 +616,6 @@ h3 {
     calc(clamp(24px, 4vh, 40px) + var(--safe-bottom)) calc(28px + var(--safe-left));
   background: var(--page-bg);
   overflow: hidden;
-}
-
-.landing-eighth-panel::after {
-  /* Solid colour fill for the page-gap seam directly below this panel. */
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  height: var(--page-gap);
-  background: #e0eae6;
 }
 
 .landing-seventh-panel {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useSearchParams } from 'react-router-dom';
 import ClickSpark from './components/ClickSpark';
+import rsvpDesign from './assets/designs/rsvp.webp';
 import HomePage from './pages/HomePage';
 import RSVPForm from './pages/RSVPForm';
 import ConfirmationPage from './pages/ConfirmationPage';
@@ -10,6 +11,60 @@ import { apiPath } from './config/api';
 import localInvitations from './data/invitations.json';
 
 const RESPONSE_STORAGE_PREFIX = 'rsvp-response:';
+
+function LoadingPagePreview() {
+  useEffect(() => {
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousHtmlScrollSnapType = document.documentElement.style.scrollSnapType;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousBodyTouchAction = document.body.style.touchAction;
+
+    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.scrollSnapType = 'none';
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
+    return () => {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.documentElement.style.scrollSnapType = previousHtmlScrollSnapType;
+      document.body.style.overflow = previousBodyOverflow;
+      document.body.style.touchAction = previousBodyTouchAction;
+    };
+  }, []);
+
+  return (
+    <div className="page landing-page loading-preview-page">
+      <section
+        className="landing-hero loading-preview-hero"
+        aria-label="Wedding invitation hero"
+        data-inset-color="#bababa"
+      >
+        <div className="loading-preview-status-wrap">
+          <div className="card confirmation-card status-card loading-preview-status-card">
+            <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
+            <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
+
+            <h1>getting your invitation</h1>
+            <p>Just a moment while we fetch your details.</p>
+          </div>
+        </div>
+
+        <div className="landing-card-wrap loading-preview-card-wrap">
+          <img
+            className="landing-invite-card loading-preview-card"
+            src={rsvpDesign}
+            alt="RSVP details for Alyza and Mark's wedding"
+          />
+        </div>
+      </section>
+
+      <div
+        className="landing-page-gap landing-page-gap-first landing-page-gap-before-carousel"
+        aria-hidden="true"
+      />
+    </div>
+  );
+}
 
 async function loadInvitation(invitationId) {
   try {
@@ -74,6 +129,7 @@ function AppContent() {
   const invitationId = searchParams.get('id');
   const [invitation, setInvitation] = useState(null);
   const [loading, setLoading] = useState(Boolean(invitationId));
+  const LOADING_DEBUG_DELAY_MS = 0;
 
   useEffect(() => {
     if (!invitationId) {
@@ -99,6 +155,7 @@ function AppContent() {
         console.error(err);
         setInvitation(null);
       } finally {
+        await new Promise((resolve) => setTimeout(resolve, LOADING_DEBUG_DELAY_MS));
         setLoading(false);
       }
     }
@@ -121,7 +178,7 @@ function AppContent() {
             <Route
               path="*"
               element={
-                <div className="page page-center confirmation-page">
+                <div className="page page-center confirmation-page single-page-shell">
                   <div className="card confirmation-card status-card">
                     <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
                     <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
@@ -134,7 +191,7 @@ function AppContent() {
             />
           )}
 
-          {invitation && (
+          {invitation && !loading && (
             <>
               <Route path="/" element={<HomePage invitation={invitation} />} />
               <Route path="/invite" element={<HomePage invitation={invitation} />} />
@@ -158,16 +215,7 @@ function AppContent() {
           {loading && (
             <Route
               path="*"
-              element={
-                <div className="page page-center confirmation-page">
-                  <div className="card confirmation-card status-card">
-                    <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
-                    <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
-                    <h1>getting your invitation</h1>
-                    <p>Just a moment while we fetch your details.</p>
-                  </div>
-                </div>
-              }
+              element={<LoadingPagePreview />}
             />
           )}
         </Routes>

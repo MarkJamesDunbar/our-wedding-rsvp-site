@@ -18,7 +18,7 @@ export default function ConfirmationPage() {
   }, [navigate, invitationId]);
 
   return (
-    <div className="page page-center confirmation-page">
+    <div className="page page-center confirmation-page single-page-shell">
       <div className="confirmation-thanks" role="status" aria-live="polite">
         <p className="confirmation-script">
           Thanks for letting us know!

@@ -12,7 +12,13 @@ import timelineDesign from '../assets/designs/timeline-2.svg';
 
 export default function HomePage() {
   const location = useLocation();
-  const renderGap = (key) => <div key={key} className="landing-page-gap" aria-hidden="true" />;
+  const renderGap = (key, className = '') => (
+    <div
+      key={key}
+      className={className ? `landing-page-gap ${className}` : 'landing-page-gap'}
+      aria-hidden="true"
+    />
+  );
 
   useEffect(() => {
     // iOS Safari paints the notch/home-indicator zones with the BODY
@@ -80,31 +86,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {renderGap('gap-hero-carousel')}
+      {renderGap('gap-hero-carousel', 'landing-page-gap-first landing-page-gap-before-carousel')}
 
       <LandingCarousel />
 
-      {renderGap('gap-carousel-timeline')}
+          {renderGap('gap-carousel-timeline', 'landing-page-gap-after-carousel landing-page-gap-before-timeline')}
 
-      <section className="landing-third-panel" aria-label="Wedding timeline section">
-        <h2 className="landing-timeline-title">
-          <span className="landing-timeline-line landing-timeline-line-top">Order of</span>
-          <span className="landing-timeline-line landing-timeline-line-bottom">The Day</span>
-        </h2>
+          <section className="landing-third-panel" aria-label="Wedding timeline section">
+            <h2 className="landing-timeline-title">
+              <span className="landing-timeline-line landing-timeline-line-top">Order of</span>
+              <span className="landing-timeline-line landing-timeline-line-bottom">The Day</span>
+            </h2>
 
-        <div className="landing-timeline-art">
-          <img
-            className="landing-timeline-artwork"
-            src={timelineDesign}
-            alt="Wedding timeline details"
-            loading="lazy"
-          />
-        </div>
-      </section>
+            <div className="landing-timeline-art">
+              <img
+                className="landing-timeline-artwork"
+                src={timelineDesign}
+                alt="Wedding timeline details"
+                loading="lazy"
+              />
+            </div>
+          </section>
 
-      {renderGap('gap-timeline-travel')}
+          {renderGap('gap-timeline-travel', 'landing-page-gap-after-timeline landing-page-gap-before-travel')}
 
-      <section className="landing-fourth-panel" aria-label="Travel information section">
+          <section className="landing-fourth-panel" aria-label="Travel information section">
         <h2 className="landing-travel-title">
           <span className="landing-travel-line">getting here...</span>
         </h2>
@@ -185,15 +191,15 @@ export default function HomePage() {
             </p>
           </section>
         </div>
-      </section>
+          </section>
 
-      {renderGap('gap-travel-international')}
+          {renderGap('gap-travel-international', 'landing-page-gap-after-travel')}
 
-      <section
-        className="landing-fifth-panel"
-        aria-label="International guests information section"
-        data-inset-color="#becbbb"
-      >
+          <section
+            className="landing-fifth-panel"
+            aria-label="International guests information section"
+            data-inset-color="#becbbb"
+          >
         <img className="landing-international-plane" src={planeDesign} alt="" aria-hidden="true" loading="lazy" />
         <h2 className="landing-international-title">
           <span className="landing-international-line landing-international-line-top">
@@ -236,15 +242,15 @@ export default function HomePage() {
             </section>
           </div>
         </div>
-      </section>
+          </section>
 
-      {renderGap('gap-international-accommodation')}
+          {renderGap('gap-international-accommodation', 'landing-page-gap-after-international')}
 
-      <section
-        className="landing-sixth-panel"
-        aria-label="Accommodation section"
-        data-inset-color="#c6cfcb"
-      >
+          <section
+            className="landing-sixth-panel"
+            aria-label="Accommodation section"
+            data-inset-color="#c6cfcb"
+          >
         <img
           className="landing-accommodation-artwork"
           src={hotelDesign}
@@ -357,7 +363,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {renderGap('gap-accommodation-dresscode')}
+      {renderGap('gap-accommodation-dresscode', 'landing-page-gap-after-accommodation')}
 
       <section className="landing-seventh-panel" aria-label="Dress code section">
         <div className="landing-dresscode-content">
@@ -392,7 +398,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {renderGap('gap-dresscode-useful')}
+      {renderGap('gap-dresscode-useful', 'landing-page-gap-after-dresscode')}
 
       <section className="landing-eighth-panel" aria-label="Useful things to know section">
         <img
@@ -446,7 +452,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {renderGap('gap-useful-accent')}
+      {renderGap('gap-useful-accent', 'landing-page-gap-after-useful')}
 
       <section
         className="landing-accent-panel"

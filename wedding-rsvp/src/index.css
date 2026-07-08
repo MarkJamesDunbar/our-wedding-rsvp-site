@@ -247,6 +247,167 @@ h3 {
   padding: 28px 18px;
 }
 
+.single-page-shell {
+  position: relative;
+  margin-bottom: var(--page-gap);
+  overflow: visible;
+}
+
+.single-page-shell::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 100vw;
+  height: var(--page-gap);
+  transform: translateX(-50%);
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      mediumseagreen 0,
+      mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
+      var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+      var(--page-bg) 100%
+    ),
+    repeating-linear-gradient(
+      to right,
+      rgba(247, 235, 219, 0.95) 0 3px,
+      transparent 3px 10px
+    );
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 100%, calc(100% - 40px) 2px;
+  background-position: 0 0, center calc(var(--page-gap-top) + var(--page-gap-bottom));
+}
+
+.loading-page-shell {
+  isolation: isolate;
+  min-height: 100svh;
+  height: 100svh;
+  margin-bottom: 0;
+  padding: calc(32px + var(--safe-top)) calc(20px + var(--safe-right))
+    calc(32px + var(--safe-bottom) + var(--page-gap)) calc(20px + var(--safe-left));
+  overflow: clip;
+}
+
+.loading-page-shell::after {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--page-gap);
+  transform: none;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+      var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+      var(--page-bg) 100%
+    ),
+    repeating-linear-gradient(
+      to right,
+      mediumseagreen 0 3px,
+      transparent 3px 10px
+    );
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 100%, calc(100% - 40px) 2px;
+  background-position: 0 0, center calc(var(--page-gap-top) + var(--page-gap-bottom));
+}
+
+.confirmation-page.loading-page-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--page-bg) url('./assets/designs/rsvp.webp') center / cover no-repeat;
+}
+
+.loading-invite-page {
+  position: relative;
+  height: 100svh;
+  isolation: isolate;
+  overflow: clip;
+}
+
+.loading-invite-page::before {
+  content: '';
+  position: absolute;
+  inset: calc(-40px - var(--safe-top)) calc(-1 * var(--safe-right)) 0 calc(-1 * var(--safe-left));
+  z-index: -2;
+  background: url('./assets/engagement_images/markdunbar-2-bw.webp') center center / cover no-repeat;
+}
+
+.loading-invite-page .landing-hero {
+  height: 100svh;
+}
+
+.loading-invite-page .landing-hero::before,
+.loading-invite-page .landing-hero::after {
+  content: none;
+}
+
+.loading-preview-page {
+  min-height: 100svh;
+  overflow: clip;
+}
+
+.loading-preview-page .landing-hero {
+  height: 100svh;
+}
+
+.loading-preview-status-wrap {
+  position: absolute;
+  inset: 50% calc(20px + var(--safe-right)) auto calc(20px + var(--safe-left));
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.loading-preview-status-card {
+  width: min(100%, 540px);
+  margin: 0;
+  pointer-events: auto;
+}
+
+.loading-preview-status-card.confirmation-card.status-card h1 {
+  line-height: 1.25;
+}
+
+.loading-preview-page .landing-hero::before,
+.loading-preview-page .landing-hero::after {
+  content: none;
+}
+
+.loading-preview-page .landing-card-wrap {
+  position: relative;
+  z-index: 1;
+  padding-top: 6px;
+}
+
+.loading-preview-page .landing-invite-card {
+  transform: translateY(calc(-1 * var(--safe-top)));
+}
+
+.loading-invite-gap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--page-gap-top) + var(--page-gap-bottom));
+  background: transparent;
+}
+
+.loading-invite-gap::after {
+  left: 20px;
+  right: 20px;
+  top: calc(var(--page-gap-top) + var(--page-gap-bottom));
+  border-top-color: mediumseagreen;
+}
+
 .confirmation-card.status-card {
   position: relative;
   width: min(100%, 540px);
@@ -338,6 +499,112 @@ h3 {
   scroll-snap-align: none;
 }
 
+.landing-page-gap-first {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    mediumseagreen 100%
+  );
+}
+
+.landing-page-gap-before-carousel {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 100%
+  );
+}
+
+.landing-page-gap-after-carousel {
+  background: linear-gradient(
+    to bottom,
+    var(--page-bg) 0,
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    mediumseagreen 100%
+  );
+}
+
+.landing-page-gap-before-timeline {
+  background: linear-gradient(
+    to bottom,
+    mediumseagreen 0,
+    mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 100%
+  );
+}
+
+.landing-page-gap-after-carousel.landing-page-gap-before-timeline {
+  background: var(--page-bg);
+}
+
+.landing-page-gap-after-timeline {
+  background: var(--page-bg);
+}
+
+.landing-page-gap-before-travel {
+  background: linear-gradient(
+    to bottom,
+    mediumseagreen 0,
+    mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 100%
+  );
+}
+
+.landing-page-gap-after-timeline.landing-page-gap-before-travel {
+  background: var(--page-bg);
+}
+
+.landing-page-gap-after-travel {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    #edf5f8 calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    #edf5f8 100%
+  );
+}
+
+.landing-page-gap-after-international {
+  background: linear-gradient(
+    to bottom,
+    #d1dec0 0,
+    #d1dec0 calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    transparent 100%
+  );
+}
+
+.landing-page-gap-after-accommodation {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 100%
+  );
+}
+
+.landing-page-gap-after-dresscode {
+  background: var(--page-bg);
+}
+
+.landing-page-gap-after-useful {
+  background: linear-gradient(
+    to bottom,
+    var(--page-bg) 0,
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    #e0eae6 calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    #e0eae6 100%
+  );
+}
+
 .landing-page-gap::after {
   content: '';
   position: absolute;
@@ -366,7 +633,8 @@ h3 {
      once cover engages) but STOP at the page bottom — the scroll cue sits
      flush with the page edge alongside the photo's bottom edge. */
   inset: calc(-40px - var(--safe-top)) calc(-1 * var(--safe-right))
-    calc(-1 * var(--safe-bottom)) calc(-1 * var(--safe-left));
+    calc(-1 * (var(--safe-bottom) + var(--page-gap-top) + var(--page-gap-bottom)))
+    calc(-1 * var(--safe-left));
   z-index: -2;
   background: url('./assets/engagement_images/markdunbar-2-bw.webp') center center / cover no-repeat;
 }
@@ -598,18 +866,27 @@ h3 {
   padding: calc(38px + var(--safe-top)) calc(28px + var(--safe-right))
     calc(230px + var(--safe-bottom)) calc(28px + var(--safe-left));
   /* background: var(--page-bg); */
-  background: var(--page-bg) url('./assets/designs/waverley.webp') center bottom / min(100%, 980px) auto no-repeat;
+  background: var(--page-bg);
   isolation: isolate;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.landing-fourth-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 calc(-1 * (var(--page-gap-top) + var(--page-gap-bottom))) 0;
+  z-index: -1;
+  background: url('./assets/designs/waverley.webp') center bottom / min(100%, 980px) auto no-repeat;
 }
 
 .landing-fifth-panel {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   padding-bottom: calc(24px + var(--safe-bottom));
   background: var(--page-bg) url('./assets/designs/international.jpg') center / cover no-repeat;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .landing-sixth-panel {
@@ -617,8 +894,9 @@ h3 {
   display: flex;
   flex-direction: column;
   padding-bottom: calc(24px + var(--safe-bottom));
-  background: var(--page-bg) url('./assets/designs/accommodation.webp') center / cover no-repeat;
-  overflow: hidden;
+  background: var(--page-bg);
+  isolation: isolate;
+  overflow: visible;
 }
 
 .landing-seventh-panel,
@@ -631,7 +909,7 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: calc(clamp(28px, 5vh, 48px) + var(--safe-top)) calc(28px + var(--safe-right))
+  padding: calc(15px + var(--safe-top)) calc(28px + var(--safe-right))
     calc(clamp(24px, 4vh, 40px) + var(--safe-bottom)) calc(28px + var(--safe-left));
   background: var(--page-bg);
   overflow: hidden;
@@ -641,7 +919,7 @@ h3 {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: calc(clamp(36px, 8vh, 82px) + var(--safe-top)) calc(28px + var(--safe-right))
+  padding: calc(clamp(18px, 4vh, 41px) + var(--safe-top)) calc(28px + var(--safe-right))
     calc(clamp(28px, 6vh, 72px) + var(--safe-bottom)) calc(28px + var(--safe-left));
   /* Never paint outside the page: panels are exact viewport height, so any
      overflow would bleed onto the neighbouring page mid-transition. */
@@ -653,9 +931,18 @@ h3 {
   flex-direction: column;
   align-items: center;
   /* Tighter above the hotel artwork; bottom gutter matches the sides. */
-  padding: calc(24px + var(--safe-top)) calc(28px + var(--safe-right))
+  padding: calc(15px + var(--safe-top)) calc(28px + var(--safe-right))
     calc(28px + var(--safe-bottom)) calc(28px + var(--safe-left));
-  overflow: hidden;
+  overflow: visible;
+}
+
+.landing-sixth-panel::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--page-gap-top)) 0
+    calc(-1 * (var(--page-gap-top) + var(--page-gap-bottom))) 0;
+  z-index: -1;
+  background: url('./assets/designs/accommodation.webp') center / cover no-repeat;
 }
 
 .landing-dresscode-content {
@@ -759,14 +1046,24 @@ h3 {
 
 .landing-accent-panel {
   position: relative;
+  isolation: isolate;
   background: #e0eae6;
-  overflow: clip;
+  overflow: visible;
 }
 
-/* The tail directly follows the last page, so drop the page-gap that would
-   otherwise show a cream strip between the green panel and the green tail. */
 .landing-page > section.landing-accent-panel {
-  margin-bottom: 0;
+  margin-bottom: calc(var(--page-gap-top) + var(--page-gap-bottom));
+}
+
+.landing-accent-panel::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: calc(var(--page-gap-top) + var(--page-gap-bottom));
+  z-index: 0;
+  background: #e0eae6;
 }
 
 /* Give the "useful things to know" page a little extra length so its content
@@ -778,29 +1075,20 @@ h3 {
 
 .landing-accent-artwork {
   position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
+  left: 50%;
+  bottom: calc(-1 * (var(--page-gap-top) + var(--page-gap-bottom)));
+  z-index: 1;
+  width: calc(100vw + 5px);
   max-width: none;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 85%;
-  transform: translateY(calc(-1 * var(--safe-bottom)));
-}
-
-/* Desktop/tablet: keep the crop slightly higher so more of the design sits
-   behind the RSVP copy while still staying inside the final panel box. */
-@media (min-width: 641px) {
-  .landing-accent-artwork {
-    object-position: center 30%;
-  }
+  height: auto;
+  transform: translateX(-50%);
 }
 
 .landing-accent-content {
   position: absolute;
   top: 34%;
   left: 50%;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1247,6 +1535,8 @@ h3 {
 }
 
 .rsvp-page {
+  position: relative;
+  isolation: isolate;
   max-width: 800px;
   margin: 0 auto;
   padding: calc(36px + var(--safe-top)) calc(30px + var(--safe-right))
@@ -1256,14 +1546,30 @@ h3 {
   gap: 30px;
 }
 
+.rsvp-attendance-page {
+  padding-bottom: calc(48px + var(--safe-bottom) + var(--page-gap-bottom));
+}
+
 .rsvp-page::before,
 .confirmation-page::before {
   content: '';
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: calc(-40px - var(--safe-bottom));
+  bottom: calc(-1 * var(--safe-bottom));
+  left: 50%;
+  width: calc(100vw + var(--safe-left) + var(--safe-right));
+  transform: translateX(-50%);
   z-index: 0;
   background: var(--page-bg) url('./assets/designs/rsvp.webp') center / cover no-repeat;
   pointer-events: none;
+}
+
+.rsvp-page::after {
+  content: none;
+}
+
+.rsvp-attendance-page::before {
+  bottom: calc(-1 * (var(--safe-top) + var(--page-gap-top)));
 }
 
 .rsvp-page > *,
@@ -1276,6 +1582,17 @@ h3 {
   margin-bottom: 20px;
   text-align: center;
   text-transform: lowercase;
+}
+
+.rsvp-scroll-floor {
+  flex: 0 0 auto;
+  width: 100%;
+  height: calc(90px + var(--safe-bottom));
+  pointer-events: none;
+}
+
+.rsvp-attendance-page .rsvp-scroll-floor {
+  height: calc(90px + var(--safe-bottom) + var(--page-gap-bottom));
 }
 
 .guest-card,
@@ -1532,6 +1849,7 @@ h3 {
 
 /* Accept, when chosen, stays the sage green. */
 .rsvp-page .btn-success {
+  border: 0;
   background: var(--sage);
   color: #f7ebdb;
 }
@@ -1541,10 +1859,6 @@ h3 {
   /* background: var(--red); */
   color: #f7ebdb;
   /* box-shadow: 0 12px 26px rgba(142, 31, 29, 0.3), 0 22px 50px rgba(44, 31, 28, 0.22); */
-}
-
-.rsvp-page .next-button:hover {
-  /* box-shadow: 0 16px 32px rgba(142, 31, 29, 0.34), 0 28px 64px rgba(44, 31, 28, 0.26); */
 }
 
 .rsvp-page .next-button:active {
@@ -1842,12 +2156,12 @@ h3 {
   }
 
   .landing-seventh-panel {
-    padding: calc(84px + var(--safe-top)) calc(16px + var(--safe-right))
+    padding: calc(42px + var(--safe-top)) calc(16px + var(--safe-right))
       calc(28px + var(--safe-bottom)) calc(16px + var(--safe-left));
   }
 
   .landing-sixth-panel {
-    padding: calc(34px + var(--safe-top)) calc(18px + var(--safe-right))
+    padding: calc(15px + var(--safe-top)) calc(18px + var(--safe-right))
       calc(24px + var(--safe-bottom)) calc(18px + var(--safe-left));
   }
 
@@ -1953,7 +2267,7 @@ h3 {
   }
 
   .landing-eighth-panel {
-    padding: calc(28px + var(--safe-top)) calc(16px + var(--safe-right))
+    padding: calc(15px + var(--safe-top)) calc(16px + var(--safe-right))
       calc(28px + var(--safe-bottom)) calc(16px + var(--safe-left));
   }
 

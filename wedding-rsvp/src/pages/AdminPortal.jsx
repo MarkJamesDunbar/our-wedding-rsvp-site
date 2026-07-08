@@ -41,7 +41,7 @@ export default function AdminPortal() {
 
   if (loading) {
     return (
-      <div className="page page-center">
+      <div className="page page-center single-page-shell">
         <div className="card status-card">
           <p className="eyebrow">Admin</p>
           <h1>Loading responses</h1>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { menuDetails } from '../data/menuOptions';
 
@@ -23,6 +23,7 @@ function createInitialResponses(invitation) {
 
 export default function RSVPForm({ invitation, courses, onSubmit }) {
   const navigate = useNavigate();
+  const scrollFloorRef = useRef(null);
   const [searchParams] = useSearchParams();
   const [error, setError] = useState(null);
   const [attendanceError, setAttendanceError] = useState(null);
@@ -30,6 +31,40 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   const [responses, setResponses] = useState(() => createInitialResponses(invitation));
   const step = searchParams.get('step') === 'menu' ? 'menu' : 'attendance';
   const rsvpPath = `/invite/rsvp?id=${invitation.qr_code}`;
+
+  useEffect(() => {
+    const RSVP_INSET_COLOR = '#f7ebdb';
+    const previousBodyBackgroundColor = document.body.style.backgroundColor;
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    const previousThemeColor = themeMeta?.getAttribute('content') || '';
+
+    document.body.style.backgroundColor = RSVP_INSET_COLOR;
+    themeMeta?.setAttribute('content', RSVP_INSET_COLOR);
+
+    return () => {
+      document.body.style.backgroundColor = previousBodyBackgroundColor;
+      if (themeMeta) {
+        themeMeta.setAttribute('content', previousThemeColor || '#f7ebdb');
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const floorNode = scrollFloorRef.current;
+    if (!floorNode) {
+      return undefined;
+    }
+
+    const getFloor = () => Math.round(floorNode.getBoundingClientRect().height);
+
+    const frameId = requestAnimationFrame(() => {
+      window.scrollTo(0, getFloor());
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [step]);
 
   // If the menu step is opened with no attending guests (e.g. a direct reload
   // resets the in-progress selections), send them back to the attendance step.
@@ -70,6 +105,7 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   if (step === 'attendance') {
     return (
       <div className="page rsvp-page rsvp-attendance-page">
+        <div ref={scrollFloorRef} className="rsvp-scroll-floor" aria-hidden="true" />
         <h1>RSVP</h1>
         
         {responses.map((response, idx) => (
@@ -157,6 +193,7 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
 
   return (
     <div className="page rsvp-page rsvp-menu-page">
+      <div ref={scrollFloorRef} className="rsvp-scroll-floor" aria-hidden="true" />
       <h1>Menu Choices</h1>
       
       {attendingGuests.map((guest) => (

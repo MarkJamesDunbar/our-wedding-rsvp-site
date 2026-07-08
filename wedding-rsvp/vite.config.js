@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-const apiProxyTarget = process.env.VITE_API_PROXY_TARGET || 'http://localhost:3001'
+const apiProxyTarget =
+  process.env.VITE_API_PROXY_TARGET || 'https://our-wedding-rsvp-site-production.up.railway.app'
 
 // Dev-only endpoint. A phone can POST its live viewport metrics here and they are
 // printed in the terminal running Vite, so real on-device numbers land somewhere

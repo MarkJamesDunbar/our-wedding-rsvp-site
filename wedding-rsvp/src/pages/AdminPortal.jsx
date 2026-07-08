@@ -41,8 +41,8 @@ export default function AdminPortal() {
 
   if (loading) {
     return (
-      <div className="page page-center single-page-shell admin-portal-page">
-        <div className="card status-card admin-loading-card">
+      <div className="page page-center single-page-shell">
+        <div className="card status-card">
           <p className="eyebrow">Admin</p>
           <h1>Loading responses</h1>
         </div>
@@ -51,7 +51,7 @@ export default function AdminPortal() {
   }
 
   return (
-    <div className="page admin-portal-page">
+    <div className="page">
       <div className="admin-header">
         <p className="eyebrow">Admin portal</p>
         <h1>Guest responses</h1>

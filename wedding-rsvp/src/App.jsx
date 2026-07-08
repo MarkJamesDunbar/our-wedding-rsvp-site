@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useSearchParams } from 'react-router-dom';
 import ClickSpark from './components/ClickSpark';
-import rsvpDesign from './assets/designs/rsvp.webp';
+import bouquetCream from './assets/designs/bouquet_cream.png';
+import CircularText from './components/CircularText';
 import HomePage from './pages/HomePage';
 import RSVPForm from './pages/RSVPForm';
 import ConfirmationPage from './pages/ConfirmationPage';
@@ -12,58 +13,96 @@ import localInvitations from './data/invitations.json';
 
 const RESPONSE_STORAGE_PREFIX = 'rsvp-response:';
 
-function LoadingPagePreview() {
+function ConfirmationStyleStatusPage({ message, detail, className = '' }) {
   useEffect(() => {
+    const STATUS_INSET_COLOR = '#571216';
+    const previousHtmlBackgroundColor = document.documentElement.style.backgroundColor;
+    const previousBodyBackgroundColor = document.body.style.backgroundColor;
+    const rootNode = document.getElementById('root');
+    const previousRootBackgroundColor = rootNode?.style.backgroundColor || '';
+    const appShellNode = document.querySelector('.app-shell');
+    const previousAppShellBackgroundColor = appShellNode instanceof HTMLElement
+      ? appShellNode.style.backgroundColor
+      : '';
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    const previousThemeColor = themeMeta?.getAttribute('content') || '';
     const previousHtmlOverflow = document.documentElement.style.overflow;
     const previousHtmlScrollSnapType = document.documentElement.style.scrollSnapType;
     const previousBodyOverflow = document.body.style.overflow;
     const previousBodyTouchAction = document.body.style.touchAction;
 
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    document.documentElement.style.backgroundColor = STATUS_INSET_COLOR;
+    document.body.style.backgroundColor = STATUS_INSET_COLOR;
     document.documentElement.style.overflow = 'hidden';
     document.documentElement.style.scrollSnapType = 'none';
     document.body.style.overflow = 'hidden';
     document.body.style.touchAction = 'none';
 
+    if (rootNode) {
+      rootNode.style.backgroundColor = STATUS_INSET_COLOR;
+    }
+    if (appShellNode instanceof HTMLElement) {
+      appShellNode.style.backgroundColor = STATUS_INSET_COLOR;
+    }
+    themeMeta?.setAttribute('content', STATUS_INSET_COLOR);
+
     return () => {
+      document.documentElement.style.backgroundColor = previousHtmlBackgroundColor;
+      document.body.style.backgroundColor = previousBodyBackgroundColor;
       document.documentElement.style.overflow = previousHtmlOverflow;
       document.documentElement.style.scrollSnapType = previousHtmlScrollSnapType;
       document.body.style.overflow = previousBodyOverflow;
       document.body.style.touchAction = previousBodyTouchAction;
+
+      if (rootNode) {
+        rootNode.style.backgroundColor = previousRootBackgroundColor;
+      }
+      if (appShellNode instanceof HTMLElement) {
+        appShellNode.style.backgroundColor = previousAppShellBackgroundColor;
+      }
+      if (themeMeta) {
+        themeMeta.setAttribute('content', previousThemeColor || '#571216');
+      }
     };
   }, []);
 
   return (
-    <div className="page landing-page loading-preview-page">
-      <section
-        className="landing-hero loading-preview-hero"
-        aria-label="Wedding invitation hero"
-        data-inset-color="#bababa"
-      >
-        <div className="loading-preview-status-wrap">
-          <div className="card confirmation-card status-card loading-preview-status-card">
-            <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
-            <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
+    <div className={`page page-center confirmation-page ${className}`.trim()}>
+      <div className="confirmation-thanks" role="status" aria-live="polite">
+        <p className="confirmation-script">
+          {message}
+          {detail ? (
+            <>
+              <br />
+              {detail}
+            </>
+          ) : null}
+        </p>
 
-            <h1>getting your invitation</h1>
-            <p>Just a moment while we fetch your details.</p>
-          </div>
-        </div>
-
-        <div className="landing-card-wrap loading-preview-card-wrap">
+        <div className="confirmation-crest" aria-hidden="true">
+          <CircularText
+            text="MOUNT STUART * ISLE OF BUTE * SCOTLAND * 26TH JUNE 2027 * "
+            spinDuration={42}
+            characterOffset="0%"
+          />
           <img
-            className="landing-invite-card loading-preview-card"
-            src={rsvpDesign}
-            alt="RSVP details for Alyza and Mark's wedding"
+            src={bouquetCream}
+            alt=""
+            className="confirmation-crest-bouquet"
+            loading="eager"
+            fetchPriority="high"
           />
         </div>
-      </section>
-
-      <div
-        className="landing-page-gap landing-page-gap-first landing-page-gap-before-carousel"
-        aria-hidden="true"
-      />
+      </div>
     </div>
   );
+}
+
+function LoadingPagePreview() {
+  return <ConfirmationStyleStatusPage message="getting your invitation" className="loading-status-page" />;
 }
 
 async function loadInvitation(invitationId) {
@@ -129,7 +168,12 @@ function AppContent() {
   const invitationId = searchParams.get('id');
   const [invitation, setInvitation] = useState(null);
   const [loading, setLoading] = useState(Boolean(invitationId));
-  const LOADING_DEBUG_DELAY_MS = 0;
+  const LOADING_DEBUG_DELAY_MS = 3000;
+
+  useEffect(() => {
+    const image = new Image();
+    image.src = bouquetCream;
+  }, []);
 
   useEffect(() => {
     if (!invitationId) {
@@ -178,15 +222,10 @@ function AppContent() {
             <Route
               path="*"
               element={
-                <div className="page page-center confirmation-page single-page-shell">
-                  <div className="card confirmation-card status-card">
-                    <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
-                    <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
-
-                    <h1>Invalid Link</h1>
-                    <p>Please check your invite QR code and try again (or reach out to Mark &lt;3).</p>
-                  </div>
-                </div>
+                <ConfirmationStyleStatusPage
+                  message="Invalid Link"
+                  detail="Please check your invite QR code and try again. (Or reach out to Mark <3)"
+                />
               }
             />
           )}

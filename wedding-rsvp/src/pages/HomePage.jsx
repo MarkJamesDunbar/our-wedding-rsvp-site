@@ -29,7 +29,6 @@ export default function HomePage() {
     // data-inset-color are cream.
     const DEFAULT_INSET_COLOR = '#f7ebdb';
     const themeMeta = document.querySelector('meta[name="theme-color"]');
-
     const applyColor = (color) => {
       document.body.style.backgroundColor = color;
       themeMeta?.setAttribute('content', color);
@@ -90,49 +89,53 @@ export default function HomePage() {
 
       <LandingCarousel />
 
-          {renderGap('gap-carousel-timeline', 'landing-page-gap-after-carousel landing-page-gap-before-timeline')}
+      {renderGap('gap-carousel-timeline', 'landing-page-gap-after-carousel landing-page-gap-before-timeline')}
 
-          <section className="landing-third-panel" aria-label="Wedding timeline section">
-            <h2 className="landing-timeline-title">
-              <span className="landing-timeline-line landing-timeline-line-top">Order of</span>
-              <span className="landing-timeline-line landing-timeline-line-bottom">The Day</span>
-            </h2>
+      <section className="landing-third-panel" aria-label="Wedding timeline section">
+        <h2 className="landing-timeline-title">
+          <span className="landing-timeline-line landing-timeline-line-top">Order of</span>
+          <span className="landing-timeline-line landing-timeline-line-bottom">The Day</span>
+        </h2>
 
-            <div className="landing-timeline-art">
-              <img
-                className="landing-timeline-artwork"
-                src={timelineDesign}
-                alt="Wedding timeline details"
-                loading="lazy"
-              />
-            </div>
-          </section>
+        <div className="landing-timeline-art">
+          <img
+            className="landing-timeline-artwork"
+            src={timelineDesign}
+            alt="Wedding timeline details"
+            loading="lazy"
+          />
+        </div>
+      </section>
 
-          {renderGap('gap-timeline-travel', 'landing-page-gap-after-timeline landing-page-gap-before-travel')}
+      {renderGap('gap-timeline-map', 'landing-page-gap-after-timeline landing-page-gap-before-map-page')}
 
-          <section className="landing-fourth-panel" aria-label="Travel information section">
+      <section className="landing-map-panel" aria-label="Map page section">
+        <section className="landing-map-venue-card" aria-label="Venue information">
+          <h3 className="landing-map-stop-title">The Venue</h3>
+          <p className="landing-map-stop-body">
+            Our venue is the fabulous{' '}
+            <a
+              className="landing-map-link"
+              href="https://www.mountstuart.com/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Mount Stuart
+            </a>{' '}
+            on the Isle of Bute, Scotland. To reach us, you will need to take the ferry from
+            Wemyss Bay to Rothesay.
+          </p>
+        </section>
+      </section>
+
+      {renderGap('gap-map-travel', 'landing-page-gap-after-map-page landing-page-gap-before-travel')}
+
+      <section className="landing-fourth-panel" aria-label="Travel information section">
         <h2 className="landing-travel-title">
-          <span className="landing-travel-line">getting here...</span>
+          <span className="landing-travel-line">getting there...</span>
         </h2>
 
         <div className="landing-travel-copy">
-          <section className="landing-travel-stop">
-            <h3 className="landing-travel-stop-title">The Venue</h3>
-            <p className="landing-travel-stop-body">
-              Our venue is the fabulous{' '}
-              <a
-                className="landing-travel-link"
-                href="https://www.mountstuart.com/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Mount Stuart
-              </a>{' '}
-              on the Isle of Bute, Scotland. To reach us, you will need to take the
-              ferry from Wemyss Bay to Rothesay.
-            </p>
-          </section>
-
           <section className="landing-travel-stop">
             <h3 className="landing-travel-stop-title">Wemyss Bay</h3>
             <p className="landing-travel-stop-body">
@@ -144,8 +147,8 @@ export default function HomePage() {
               >
                 Wemyss Bay
               </a>{' '}
-              is approximately 45 minutes from Glasgow by car. By train, direct
-              services run from Glasgow Central straight to{' '}
+              is approximately 45 minutes from Glasgow by car. By train, direct services run from
+              Glasgow Central straight to{' '}
               <a
                 className="landing-travel-link"
                 href="https://maps.app.goo.gl/N1qCWeZzyuKYjGjv8"
@@ -177,8 +180,7 @@ export default function HomePage() {
           <section className="landing-travel-stop">
             <h3 className="landing-travel-stop-title">Rothesay to Mount Stuart</h3>
             <p className="landing-travel-stop-body">
-              Mount Stuart is 5 miles south of Rothesay. Taxis are available but we
-              recommend{' '}
+              Mount Stuart is 5 miles south of Rothesay. Taxis are available but we recommend{' '}
               <a
                 className="landing-travel-link"
                 href="https://www.thomsonlocal.com/search/taxis/isle-of-bute"
@@ -191,16 +193,22 @@ export default function HomePage() {
             </p>
           </section>
         </div>
-          </section>
+      </section>
 
-          {renderGap('gap-travel-international', 'landing-page-gap-after-travel')}
+      {renderGap('gap-travel-international', 'landing-page-gap-after-travel')}
 
-          <section
-            className="landing-fifth-panel"
-            aria-label="International guests information section"
-            data-inset-color="#becbbb"
-          >
-        <img className="landing-international-plane" src={planeDesign} alt="" aria-hidden="true" loading="lazy" />
+      <section
+        className="landing-fifth-panel"
+        aria-label="International guests information section"
+        data-inset-color="#becbbb"
+      >
+        <img
+          className="landing-international-plane"
+          src={planeDesign}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+        />
         <h2 className="landing-international-title">
           <span className="landing-international-line landing-international-line-top">
             for international
@@ -242,15 +250,15 @@ export default function HomePage() {
             </section>
           </div>
         </div>
-          </section>
+      </section>
 
-          {renderGap('gap-international-accommodation', 'landing-page-gap-after-international')}
+      {renderGap('gap-international-accommodation', 'landing-page-gap-after-international')}
 
-          <section
-            className="landing-sixth-panel"
-            aria-label="Accommodation section"
-            data-inset-color="#c6cfcb"
-          >
+      <section
+        className="landing-sixth-panel"
+        aria-label="Accommodation section"
+        data-inset-color="#c6cfcb"
+      >
         <img
           className="landing-accommodation-artwork"
           src={hotelDesign}
@@ -378,7 +386,7 @@ export default function HomePage() {
 
           <p className="landing-dresscode-body">We would love for our guests to dress to impress!</p>
 
-          <p className="landing-dresscode-emphasis">Formal attire</p>
+          <p className="landing-dresscode-emphasis">Formal attire - there will be a ceilidh in the evening, so we recommend some comfortable shoes for dancing.</p>
 
           <p className="landing-dresscode-body">
             We kindly ask that guests avoid wearing burgundy or deep red tones, as these are
@@ -419,33 +427,30 @@ export default function HomePage() {
           <section className="landing-useful-stop">
             <h3 className="landing-useful-stop-title">Cash</h3>
             <p className="landing-useful-stop-body">
-              We recommend arriving with some cash as card coverage can be limited in more rural
-              parts of the island.
+              We recommend arriving with some cash as some businesses on the island may not take card.
             </p>
           </section>
 
           <section className="landing-useful-stop">
             <h3 className="landing-useful-stop-title">Mobile signal</h3>
             <p className="landing-useful-stop-body">
-              Signal on the Isle of Bute can be patchy in places, particularly outside Rothesay.
-              We recommend downloading any maps, ferry tickets, or accommodation confirmations to
-              your phone before you travel!
+              Signal on the Isle of Bute can be patchy - we recommend downloading ferry tickets, or accommodation confirmations to
+              your phone before you travel just in case.
             </p>
           </section>
 
           <section className="landing-useful-stop">
             <h3 className="landing-useful-stop-title">Stocking up</h3>
             <p className="landing-useful-stop-body">
-              Rothesay is Bute's main town and has everyday essentials including a pharmacy,
-              supermarket, and cash machines. For larger shops or shopping centres, we recommend
-              picking these up on the mainland before taking the ferry.
+              Rothesay is Bute's main town and has plenty of local shops, and cash machines. We recommend
+              picking larger shops on the mainland before taking the ferry.
             </p>
           </section>
 
           <section className="landing-useful-stop">
             <h3 className="landing-useful-stop-title">The weather</h3>
             <p className="landing-useful-stop-body">
-              Scotland in June can be glorious – but do pack a layer and a compact umbrella just in
+              Scotland in June can be glorious, but do pack an umbrella just in
               case. We'll be keeping our fingers crossed for sunshine!
             </p>
           </section>
@@ -459,7 +464,12 @@ export default function HomePage() {
         aria-label="RSVP reminder section"
         data-inset-color="#e0eae6"
       >
-        <img className="landing-accent-artwork" src={rsvpPageDesign} alt="RSVP reminder details" loading="lazy" />
+        <img
+          className="landing-accent-artwork"
+          src={rsvpPageDesign}
+          alt="RSVP reminder details"
+          loading="lazy"
+        />
 
         <div className="landing-accent-content">
           <p className="landing-accent-copy">

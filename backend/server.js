@@ -63,12 +63,17 @@ async function seedInvitations() {
     for (const inv of entries) {
       await pool.query(
         `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests)
-         VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (id) DO UPDATE SET
+           invite_id = EXCLUDED.invite_id,
+           primary_guest = EXCLUDED.primary_guest,
+           party_size = EXCLUDED.party_size,
+           guests = EXCLUDED.guests`,
         [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)]
       );
       seeded++;
     }
-    console.log('Seeded', seeded, 'invitations (duplicates skipped)');
+    console.log('Seeded', seeded, 'invitations (existing rows updated)');
   } catch (err) {
     console.warn('Seeding failed, server will continue without seed data:', err.message);
   }

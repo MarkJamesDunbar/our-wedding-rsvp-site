@@ -1,19 +1,40 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { menuDetails } from '../data/menuOptions';
 
-function getOptionId(guestName, courseId, optionIndex) {
-  return `${guestName}-${courseId}-${optionIndex}`.replace(/\s+/g, '-').toLowerCase();
+function getGuestKey(guest, index) {
+  return guest.id || guest.name || `guest-${index}`;
+}
+
+function getGuestDisplayName(guest) {
+  if (guest.name) {
+    return guest.name;
+  }
+
+  return [guest.first_name, guest.second_name].filter(Boolean).join(' ');
+}
+
+function getOptionId(guestKey, courseId, optionIndex) {
+  return `${guestKey}-${courseId}-${optionIndex}`.replace(/\s+/g, '-').toLowerCase();
 }
 
 function createInitialResponses(invitation) {
   const savedResponses = Array.isArray(invitation.response) ? invitation.response : [];
 
-  return invitation.guests.map((guest) => {
-    const savedResponse = savedResponses.find((response) => response.name === guest.name);
+  return invitation.guests.map((guest, index) => {
+    const guestKey = getGuestKey(guest, index);
+    const guestName = getGuestDisplayName(guest);
+    const savedResponse = savedResponses.find(
+      (response) => response.guestId === guestKey || response.name === guestName
+    );
 
     return {
-      name: guest.name,
+      guestId: guestKey,
+      name: guestName,
+      firstName: guest.first_name || '',
+      secondName: guest.second_name || '',
+      isChild: Boolean(guest.is_child),
+      isInfant: Boolean(guest.is_infant),
       attending: savedResponse?.attending ?? null,
       courses: savedResponse?.courses ?? {},
       dietary: savedResponse?.dietary ?? ''
@@ -23,7 +44,6 @@ function createInitialResponses(invitation) {
 
 export default function RSVPForm({ invitation, courses, onSubmit }) {
   const navigate = useNavigate();
-  const scrollFloorRef = useRef(null);
   const [searchParams] = useSearchParams();
   const [error, setError] = useState(null);
   const [attendanceError, setAttendanceError] = useState(null);
@@ -33,37 +53,51 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   const rsvpPath = `/invite/rsvp?id=${invitation.qr_code}`;
 
   useEffect(() => {
-    const RSVP_INSET_COLOR = '#f7ebdb';
+    const RSVP_INSET_COLOR = '#571216';
+    const previousHtmlBackgroundColor = document.documentElement.style.backgroundColor;
     const previousBodyBackgroundColor = document.body.style.backgroundColor;
+    const rootNode = document.getElementById('root');
+    const previousRootBackgroundColor = rootNode?.style.backgroundColor || '';
+    const appShellNode = document.querySelector('.app-shell');
+    const previousAppShellBackgroundColor = appShellNode instanceof HTMLElement
+      ? appShellNode.style.backgroundColor
+      : '';
     const themeMeta = document.querySelector('meta[name="theme-color"]');
     const previousThemeColor = themeMeta?.getAttribute('content') || '';
 
+    document.documentElement.style.backgroundColor = RSVP_INSET_COLOR;
     document.body.style.backgroundColor = RSVP_INSET_COLOR;
+    if (rootNode) {
+      rootNode.style.backgroundColor = RSVP_INSET_COLOR;
+    }
+    if (appShellNode instanceof HTMLElement) {
+      appShellNode.style.backgroundColor = RSVP_INSET_COLOR;
+    }
     themeMeta?.setAttribute('content', RSVP_INSET_COLOR);
 
     return () => {
+      document.documentElement.style.backgroundColor = previousHtmlBackgroundColor;
       document.body.style.backgroundColor = previousBodyBackgroundColor;
+      if (rootNode) {
+        rootNode.style.backgroundColor = previousRootBackgroundColor;
+      }
+      if (appShellNode instanceof HTMLElement) {
+        appShellNode.style.backgroundColor = previousAppShellBackgroundColor;
+      }
       if (themeMeta) {
-        themeMeta.setAttribute('content', previousThemeColor || '#f7ebdb');
+        themeMeta.setAttribute('content', previousThemeColor || '#571216');
       }
     };
   }, []);
 
   useEffect(() => {
-    const floorNode = scrollFloorRef.current;
-    if (!floorNode) {
-      return undefined;
-    }
-
-    const getFloor = () => Math.round(floorNode.getBoundingClientRect().height);
-
-    const frameId = requestAnimationFrame(() => {
-      window.scrollTo(0, getFloor());
+    const frameId = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     });
 
-    return () => {
-      cancelAnimationFrame(frameId);
-    };
+    return () => window.cancelAnimationFrame(frameId);
   }, [step]);
 
   // If the menu step is opened with no attending guests (e.g. a direct reload
@@ -105,8 +139,10 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   if (step === 'attendance') {
     return (
       <div className="page rsvp-page rsvp-attendance-page">
-        <div ref={scrollFloorRef} className="rsvp-scroll-floor" aria-hidden="true" />
-        <h1>RSVP</h1>
+        <h1>
+          <span className="rsvp-title-line">RSVP</span>
+          <span className="rsvp-title-line">Confirmation</span>
+        </h1>
         
         {responses.map((response, idx) => (
           <div key={idx} className="card guest-card">
@@ -146,23 +182,24 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   }
 
   // Page 2: Menu selection (only for attending guests)
-  const attendingGuests = responses.filter(r => r.attending === true);
+  const attendingGuests = responses.filter((response) => response.attending === true);
+  const adultGuests = attendingGuests.filter((guest) => !guest.isChild && !guest.isInfant);
 
-  const handleCourseChange = (guestName, courseId, value) => {
+  const handleCourseChange = (guestId, courseId, value) => {
     const updated = [...responses];
-    const guestIdx = updated.findIndex(r => r.name === guestName);
+    const guestIdx = updated.findIndex((response) => response.guestId === guestId);
     updated[guestIdx].courses[courseId] = value;
     setResponses(updated);
     setInvalidCourseFields((current) => {
       const next = { ...current };
-      delete next[`${guestName}:${courseId}`];
+      delete next[`${guestId}:${courseId}`];
       return next;
     });
   };
 
-  const handleDietaryChange = (guestName, value) => {
+  const handleDietaryChange = (guestId, value) => {
     const updated = [...responses];
-    const guestIdx = updated.findIndex(r => r.name === guestName);
+    const guestIdx = updated.findIndex((response) => response.guestId === guestId);
     updated[guestIdx].dietary = value;
     setResponses(updated);
   };
@@ -170,10 +207,10 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
   const handleSubmit = async () => {
     const missingFields = {};
 
-    attendingGuests.forEach((guest) => {
+    adultGuests.forEach((guest) => {
       courses.forEach((course) => {
         if (!guest.courses[course.id]) {
-          missingFields[`${guest.name}:${course.id}`] = true;
+          missingFields[`${guest.guestId}:${course.id}`] = true;
         }
       });
     });
@@ -193,102 +230,127 @@ export default function RSVPForm({ invitation, courses, onSubmit }) {
 
   return (
     <div className="page rsvp-page rsvp-menu-page">
-      <div ref={scrollFloorRef} className="rsvp-scroll-floor" aria-hidden="true" />
       <h1>Menu Choices</h1>
       
       {attendingGuests.map((guest) => (
-        <div key={guest.name} className="card guest-card menu-preview-card menu-guest-card">
+              <div key={guest.guestId} className="card guest-card menu-preview-card menu-guest-card">
           <span className="landing-accommodation-corner landing-accommodation-corner-tl" aria-hidden="true" />
           <span className="landing-accommodation-corner landing-accommodation-corner-br" aria-hidden="true" />
           <div className="menu-preview-intro menu-guest-intro">
             <h2 className="menu-guest-name">{guest.name}</h2>
-            <p className="menu-guest-subtitle">Your Menu</p>
-            <p className="menu-guest-meta">{menuDetails.intro} {menuDetails.legend}</p>
+                  <p className="menu-guest-subtitle">
+                    {guest.isInfant ? 'Baby Requests' : guest.isChild ? menuDetails.childrensMenu.label : 'Your Menu'}
+                  </p>
+                  {!guest.isChild && !guest.isInfant && (
+                    <p className="menu-guest-meta">{menuDetails.intro} {menuDetails.legend}</p>
+                  )}
           </div>
 
-          {menuDetails.sections.map((section) => {
-            const items = section.type === 'choice' ? section.options : section.items;
-            const fieldKey = `${guest.name}:${section.id}`;
-            const isInvalid = section.type === 'choice' && Boolean(invalidCourseFields[fieldKey]);
+                {!guest.isChild && !guest.isInfant && menuDetails.sections.map((section) => {
+                  const items = section.type === 'choice' ? section.options : section.items;
+                  const fieldKey = `${guest.guestId}:${section.id}`;
+                  const isInvalid = section.type === 'choice' && Boolean(invalidCourseFields[fieldKey]);
 
-            return (
-              <div
-                key={section.id}
-                className={`menu-section${isInvalid ? ' menu-course-field-error' : ''}`}
-              >
-                <h3>{section.label}</h3>
+                  return (
+                    <div
+                      key={section.id}
+                      className={`menu-section${isInvalid ? ' menu-course-field-error' : ''}`}
+                    >
+                      <h3>{section.label}</h3>
 
-                {section.type === 'choice' ? (
-                  <div className="menu-choice-list" role="radiogroup" aria-label={`${guest.name} ${section.label}`}>
-                    {items.map((item, index) => {
-                      const optionId = getOptionId(guest.name, section.id, index);
-                      const isSelected = guest.courses[section.id] === item.value;
+                      {section.type === 'choice' ? (
+                        <div className="menu-choice-list" role="radiogroup" aria-label={`${guest.name} ${section.label}`}>
+                          {items.map((item, index) => {
+                            const optionId = getOptionId(guest.guestId, section.id, index);
+                            const isSelected = guest.courses[section.id] === item.value;
 
-                      return (
-                        <label
-                          key={item.value}
-                          htmlFor={optionId}
-                          className={`menu-choice-option${isSelected ? ' is-selected' : ''}`}
-                        >
-                          <input
-                            id={optionId}
-                            type="radio"
-                            name={`${guest.name}-${section.id}`}
-                            className="menu-choice-input"
-                            checked={isSelected}
-                            onChange={() => {
-                              handleCourseChange(guest.name, section.id, item.value);
-                              setError(null);
-                            }}
-                          />
-                          <span className="menu-choice-control" aria-hidden="true" />
-                          <span className="menu-choice-copy">
-                            <span className="menu-choice-title">
-                              <span className="menu-choice-prefix">{`Choice ${index + 1}`}</span>
-                              <span className="menu-choice-text">{` - ${item.value}`}</span>
-                            </span>
-                            {(item.dietary || item.allergens) && (
-                              <span className="menu-choice-note">
-                                {item.dietary && <span>{`(${item.dietary})`}</span>}
-                                {item.allergens && <span>{`(${item.allergens})`}</span>}
-                              </span>
-                            )}
-                          </span>
-                        </label>
-                      );
-                    })}
+                            return (
+                              <label
+                                key={item.value}
+                                htmlFor={optionId}
+                                className={`menu-choice-option${isSelected ? ' is-selected' : ''}`}
+                              >
+                                <input
+                                  id={optionId}
+                                  type="radio"
+                                  name={`${guest.guestId}-${section.id}`}
+                                  className="menu-choice-input"
+                                  checked={isSelected}
+                                  onChange={() => {
+                                    handleCourseChange(guest.guestId, section.id, item.value);
+                                    setError(null);
+                                  }}
+                                />
+                                <span className="menu-choice-control" aria-hidden="true" />
+                                <span className="menu-choice-copy">
+                                  <span className="menu-choice-title">
+                                    <span className="menu-choice-prefix">{`Choice ${index + 1}`}</span>
+                                    <span className="menu-choice-text">{` - ${item.value}`}</span>
+                                  </span>
+                                  {(item.dietary || item.allergens) && (
+                                    <span className="menu-choice-note">
+                                      {item.dietary && <span>{`(${item.dietary})`}</span>}
+                                      {item.allergens && <span>{`(${item.allergens})`}</span>}
+                                    </span>
+                                  )}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <ul className="menu-section-list">
+                          {items.map((item) => (
+                            <li key={item.value} className="menu-section-item">
+                              <p className="menu-item-name">{item.value}</p>
+                              {item.allergens && <p className="menu-item-note">({item.allergens})</p>}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {guest.isChild && (
+                  <div className="menu-section">
+                    <h3>{menuDetails.childrensMenu.label}</h3>
+                    <p className="menu-children-copy">{menuDetails.childrensMenu.items.join(' · ')}</p>
                   </div>
-                ) : (
-                  <ul className="menu-section-list">
-                    {items.map((item) => (
-                      <li key={item.value} className="menu-section-item">
-                        <p className="menu-item-name">{item.value}</p>
-                        {item.allergens && <p className="menu-item-note">({item.allergens})</p>}
-                      </li>
-                    ))}
-                  </ul>
                 )}
-              </div>
-            );
-          })}
 
-          <div className="menu-section">
-            <h3>{menuDetails.childrensMenu.label}</h3>
-            <p className="menu-children-copy">{menuDetails.childrensMenu.items.join(' · ')}</p>
-          </div>
+                {guest.isInfant && (
+                  <div className="menu-section menu-dietary-section">
+                    <p className="menu-dietary-note">
+                      We are happy to help provide for your baby. Please let us know if you need
+                      anything such as a highchair, space for a pram, or somewhere to warm a
+                      bottle.
+                    </p>
+                    <div className="form-field menu-dietary-field">
+                      <textarea
+                        id={`dietary-${guest.guestId}`}
+                        placeholder="Please let us know if you need anything for your baby."
+                        value={guest.dietary}
+                        onChange={(e) => handleDietaryChange(guest.guestId, e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
 
-          <div className="menu-section menu-dietary-section">
-            <h3>Dietary Requirements</h3>
-            <p className="menu-dietary-note">Please include dietary requirements here.</p>
-            <div className="form-field menu-dietary-field">
-              <textarea
-                id={`dietary-${guest.name}`}
-                placeholder="(e.g., vegan, gluten-free, allergies)"
-                value={guest.dietary}
-                onChange={(e) => handleDietaryChange(guest.name, e.target.value)}
-              />
-            </div>
-          </div>
+                {!guest.isInfant && (
+                  <div className="menu-section menu-dietary-section">
+                    <h3>Dietary Requirements</h3>
+                    <p className="menu-dietary-note">Please include dietary requirements here.</p>
+                    <div className="form-field menu-dietary-field">
+                      <textarea
+                        id={`dietary-${guest.guestId}`}
+                        placeholder="(e.g., vegan, gluten-free, allergies)"
+                        value={guest.dietary}
+                        onChange={(e) => handleDietaryChange(guest.guestId, e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
         </div>
       ))}
 

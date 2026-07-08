@@ -240,6 +240,7 @@ h3 {
 }
 
 .confirmation-page {
+  --rsvp-accent: #571216;
   min-height: 100svh;
   display: flex;
   align-items: center;
@@ -265,8 +266,8 @@ h3 {
   background:
     linear-gradient(
       to bottom,
-      mediumseagreen 0,
-      mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
+      var(--page-bg) 0,
+      var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
       var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
       var(--page-bg) 100%
     ),
@@ -307,7 +308,7 @@ h3 {
     ),
     repeating-linear-gradient(
       to right,
-      mediumseagreen 0 3px,
+      var(--rsvp-accent, var(--red)) 0 3px,
       transparent 3px 10px
     );
   background-repeat: no-repeat, no-repeat;
@@ -405,7 +406,7 @@ h3 {
   left: 20px;
   right: 20px;
   top: calc(var(--page-gap-top) + var(--page-gap-bottom));
-  border-top-color: mediumseagreen;
+  border-top-color: var(--page-bg);
 }
 
 .confirmation-card.status-card {
@@ -477,9 +478,7 @@ h3 {
    engages viewport-fit=cover so page content extends (blurred) under the
    notch and home indicator — the system inset effect. */
 .landing-page {
-  /* Paints the inter-page gaps. DEV: green so the spacers are visible while
-     tuning — revert to var(--page-bg) for the real cream. */
-  background: mediumseagreen;
+  background: var(--page-bg);
 }
 
 .landing-page > section {
@@ -494,7 +493,7 @@ h3 {
   position: relative;
   height: var(--page-gap);
   flex: 0 0 var(--page-gap);
-  background: mediumseagreen;
+  background: var(--page-bg);
   pointer-events: none;
   scroll-snap-align: none;
 }
@@ -504,8 +503,8 @@ h3 {
     to bottom,
     transparent 0,
     transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
-    mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
-    mediumseagreen 100%
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 100%
   );
 }
 
@@ -524,16 +523,16 @@ h3 {
     to bottom,
     var(--page-bg) 0,
     var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
-    mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
-    mediumseagreen 100%
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 100%
   );
 }
 
 .landing-page-gap-before-timeline {
   background: linear-gradient(
     to bottom,
-    mediumseagreen 0,
-    mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 0,
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
     var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
     var(--page-bg) 100%
   );
@@ -547,11 +546,12 @@ h3 {
   background: var(--page-bg);
 }
 
-.landing-page-gap-before-travel {
+.landing-page-gap-before-travel,
+.landing-page-gap-before-map-page {
   background: linear-gradient(
     to bottom,
-    mediumseagreen 0,
-    mediumseagreen calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 0,
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
     var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
     var(--page-bg) 100%
   );
@@ -561,7 +561,25 @@ h3 {
   background: var(--page-bg);
 }
 
+.landing-page-gap-after-timeline.landing-page-gap-before-map-page {
+  background: var(--page-bg);
+}
+
+.landing-page-gap-after-map-page {
+  background: var(--page-bg);
+}
+
 .landing-page-gap-after-travel {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    #edf5f8 calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    #edf5f8 100%
+  );
+}
+
+.landing-page-gap-after-map {
   background: linear-gradient(
     to bottom,
     transparent 0,
@@ -858,7 +876,8 @@ h3 {
   overflow: hidden;
 }
 
-.landing-fourth-panel {
+.landing-fourth-panel,
+.landing-map-panel {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -871,12 +890,77 @@ h3 {
   overflow: visible;
 }
 
-.landing-fourth-panel::before {
+.landing-fourth-panel::before,
+.landing-map-panel::before {
   content: '';
   position: absolute;
   inset: 0 0 calc(-1 * (var(--page-gap-top) + var(--page-gap-bottom))) 0;
   z-index: -1;
   background: url('./assets/designs/waverley.webp') center bottom / min(100%, 980px) auto no-repeat;
+}
+
+.landing-map-panel {
+  padding: 0;
+  background: transparent;
+}
+
+.landing-map-panel::before {
+  top: calc(-1 * var(--page-gap-top));
+  right: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: url('./assets/designs/bute.webp') center / cover no-repeat;
+}
+
+.landing-map-venue-card {
+  position: absolute;
+  left: calc(22px + var(--safe-left));
+  bottom: calc(22px + var(--safe-bottom));
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+  width: min(420px, calc(100vw - 44px - var(--safe-left) - var(--safe-right)));
+  padding: 20px 22px;
+  background: transparent;
+}
+
+.landing-bute-panel {
+  position: relative;
+  background: transparent;
+  isolation: isolate;
+  overflow: visible;
+}
+
+.landing-bute-panel::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--page-gap-top));
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+  background: url('./assets/designs/bute.webp') center / cover no-repeat;
+}
+
+.landing-page-gap-bute-span {
+  background: transparent;
+}
+
+.landing-page-gap-bute-top {
+  background: transparent;
+}
+
+.landing-page-gap-bute-bottom {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 100%
+  );
 }
 
 .landing-fifth-panel {
@@ -1407,7 +1491,8 @@ h3 {
   pointer-events: none;
 } */
 
-.landing-travel-title {
+.landing-travel-title,
+.landing-map-title {
   position: relative;
   z-index: 1;
   align-self: stretch;
@@ -1418,14 +1503,16 @@ h3 {
   font-weight: 400;
 }
 
-.landing-travel-line {
+.landing-travel-line,
+.landing-map-line {
   display: block;
   font-size: 2.85rem;
   line-height: 0.9;
   white-space: nowrap;
 }
 
-.landing-travel-copy {
+.landing-travel-copy,
+.landing-map-copy {
   position: relative;
   z-index: 1;
   display: grid;
@@ -1436,7 +1523,8 @@ h3 {
   text-align: center;
 }
 
-.landing-travel-stop {
+.landing-travel-stop,
+.landing-map-stop {
   display: grid;
   gap: 18px;
 }
@@ -1444,7 +1532,8 @@ h3 {
 /* Desktop/tablet: two columns keep the copy block short enough to sit clear
    of the bottom-anchored steamer artwork. */
 @media (min-width: 641px) {
-  .landing-travel-copy {
+  .landing-travel-copy,
+  .landing-map-copy {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 56px;
     row-gap: 38px;
@@ -1454,26 +1543,39 @@ h3 {
 }
 
 .landing-travel-stop-title,
-.landing-travel-stop-body {
+.landing-travel-stop-body,
+.landing-map-stop-title,
+.landing-map-stop-body {
   margin: 0;
   color: #54535b;
 }
 
-.landing-travel-stop-title {
+.landing-travel-stop-title,
+.landing-map-stop-title {
   font-family: var(--font-script);
   font-size: 1.2rem;
   font-weight: 400;
   line-height: 1.08;
 }
 
-.landing-travel-stop-body {
+.landing-map-stop-title {
+  font-size: 1.4rem;
+}
+
+.landing-travel-stop-body,
+.landing-map-stop-body {
   font-family: var(--font-recoleta);
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.18;
 }
 
-.landing-travel-link {
+.landing-map-stop-body {
+  font-size: 1.38rem;
+}
+
+.landing-travel-link,
+.landing-map-link {
   color: inherit;
   font-weight: 700;
   text-decoration-line: underline;
@@ -1482,7 +1584,8 @@ h3 {
   text-underline-offset: 0.14em;
 }
 
-.landing-travel-link:hover {
+.landing-travel-link:hover,
+.landing-map-link:hover {
   text-decoration-color: currentColor;
 }
 
@@ -1498,20 +1601,17 @@ h3 {
   display: block;
   z-index: 1;
   line-height: 0.9;
-  white-space: nowrap;
 }
 
 .landing-timeline-line-top {
   /* Anchor the cascade to the CENTER column so it stays attached to the
      artwork on wide screens (a fixed left offset drifted to the far corner). */
-  top: calc(38px + var(--safe-top));
   left: 50%;
   font-size: 2.85rem;
   transform: translateX(-105%);
 }
 
 .landing-timeline-line-bottom {
-  top: calc(100px + var(--safe-top));
   left: 50%;
   font-size: 2.85rem;
   transform: translateX(-36%);
@@ -1534,7 +1634,76 @@ h3 {
   object-position: bottom center;
 }
 
+.rsvp-static-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--page-bg);
+}
+
+.rsvp-static-title {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.rsvp-static-title-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  line-height: 0.9;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-size: 3.2rem;
+}
+
+.rsvp-static-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.rsvp-static-page::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--page-gap-top) + var(--page-gap-bottom));
+  bottom: var(--page-gap-top);
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: 0;
+  background: var(--page-bg);
+  pointer-events: none;
+}
+
+.rsvp-static-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+.rsvp-static-gap-top {
+  background: linear-gradient(
+    to bottom,
+    var(--page-bg) 0,
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    transparent 100%
+  );
+}
+
+.rsvp-static-gap-bottom {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) calc(var(--page-gap-top) + var(--page-gap-bottom)),
+    var(--page-bg) 100%
+  );
+}
+
 .rsvp-page {
+  --rsvp-accent: #571216;
   position: relative;
   isolation: isolate;
   max-width: 800px;
@@ -1550,6 +1719,10 @@ h3 {
   padding-bottom: calc(48px + var(--safe-bottom) + var(--page-gap-bottom));
 }
 
+.rsvp-menu-page {
+  --rsvp-menu-muted: #5a4c48;
+}
+
 .rsvp-page::before,
 .confirmation-page::before {
   content: '';
@@ -1560,12 +1733,23 @@ h3 {
   width: calc(100vw + var(--safe-left) + var(--safe-right));
   transform: translateX(-50%);
   z-index: 0;
-  background: var(--page-bg) url('./assets/designs/rsvp.webp') center / cover no-repeat;
+  background: var(--rsvp-accent, var(--red));
   pointer-events: none;
 }
 
+
 .rsvp-page::after {
-  content: none;
+  content: '';
+  position: fixed;
+  top: 52svh;
+  left: 50%;
+  width: min(72vw, 420px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background: url('./assets/designs/bouquet_cream.png') center / contain no-repeat;
 }
 
 .rsvp-attendance-page::before {
@@ -1582,6 +1766,15 @@ h3 {
   margin-bottom: 20px;
   text-align: center;
   text-transform: lowercase;
+  color: #f7ebdb;
+  font-family: 'Beth Ellen', 'Cormorant Garamond', cursive;
+  font-weight: 400;
+  font-size: 3rem;
+  line-height: 0.96;
+}
+
+.rsvp-title-line {
+  display: block;
 }
 
 .rsvp-scroll-floor {
@@ -1615,10 +1808,10 @@ h3 {
 
 .error-banner {
   padding: 14px 16px;
-  border: 1px solid rgba(142, 31, 29, 0.28);
+  border: 1px solid rgba(247, 235, 219, 0.28);
   border-radius: 18px;
-  background: rgba(142, 31, 29, 0.08);
-  color: var(--red);
+  background: rgba(247, 235, 219, 0.12);
+  color: #f7ebdb;
 }
 
 .menu-preview-intro,
@@ -1635,7 +1828,7 @@ h3 {
 
 .menu-guest-subtitle {
   margin-bottom: 0;
-  color: var(--text-muted);
+  color: var(--rsvp-menu-muted, var(--text-muted));
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -1647,7 +1840,7 @@ h3 {
 .caption {
   margin-bottom: 0;
   font-family: var(--font-serif);
-  color: var(--text-muted);
+  color: var(--rsvp-menu-muted, var(--text-muted));
   font-size: 1.28rem;
 }
 
@@ -1666,7 +1859,7 @@ h3 {
 
 .menu-dietary-note {
   margin: -2px 0 6px;
-  color: var(--text-muted);
+  color: var(--rsvp-menu-muted, var(--text-muted));
   font-size: 1.1rem;
 }
 
@@ -1741,13 +1934,13 @@ h3 {
 
 .menu-choice-note,
 .menu-item-note {
-  color: var(--text-muted);
+  color: var(--rsvp-menu-muted, var(--text-muted));
   font-size: 1.02rem;
 }
 
 .menu-course-field-error {
   border-radius: 18px;
-  outline: 2px solid rgba(142, 31, 29, 0.18);
+  outline: 2px solid rgba(247, 235, 219, 0.28);
   outline-offset: 8px;
 }
 
@@ -1758,7 +1951,7 @@ h3 {
   position: relative;
   border: 0;
   border-radius: 0;
-  background: rgba(244, 242, 237, 0.85);
+  background: rgba(234, 217, 202, 0.95);
   /* box-shadow: 0 10px 24px rgba(44, 31, 28, 0.16), 0 26px 60px rgba(44, 31, 28, 0.22); */
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -1775,7 +1968,6 @@ h3 {
   z-index: 1;
 }
 
-.rsvp-page h1,
 .confirmation-card h1 {
   font-family: var(--font-script);
   font-weight: 400;
@@ -1805,6 +1997,7 @@ h3 {
 .menu-section h3 {
   font-family: var(--font-script);
   font-weight: 400;
+  color: var(--red);
 }
 
 .rsvp-page button {
@@ -1812,13 +2005,13 @@ h3 {
   padding: 12px 20px;
   border: 0;
   border-radius: 0;
-  background: #313635;
+  background: var(--rsvp-accent, var(--red));
   color: #f7ebdb;
   font-family: var(--font-serif);
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: 0;
-  box-shadow: 0 10px 18px rgba(49, 54, 53, 0.18);
+  box-shadow: 0 8px 16px rgba(44, 31, 28, 0.16);
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 
@@ -1827,10 +2020,9 @@ h3 {
 }
 
 .rsvp-page .btn-ghost {
-  border: 1.5px solid rgba(142, 31, 29, 0.45);
-  background: #ffffff;
-  color: var(--red);
-  box-shadow: 0 6px 14px rgba(44, 31, 28, 0.1);
+  background: #ead9ca;
+  color: var(--rsvp-accent, var(--red));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 8px 18px rgba(44, 31, 28, 0.14);
 }
 
 /* Accept / decline use Cormorant (Beth Ellen is too hard to read here). */
@@ -1843,7 +2035,7 @@ h3 {
 }
 
 .rsvp-page .btn-danger {
-  background: #8d5b59;
+  background: #a34441;
   color: #f7ebdb;
 }
 
@@ -1856,9 +2048,9 @@ h3 {
 
 /* Primary actions (Next / Submit): red "card" buttons with a clear shadow + press animation. */
 .rsvp-page .next-button {
-  /* background: var(--red); */
-  color: #f7ebdb;
-  /* box-shadow: 0 12px 26px rgba(142, 31, 29, 0.3), 0 22px 50px rgba(44, 31, 28, 0.22); */
+  background: #ead9ca;
+  color: var(--rsvp-accent, var(--red));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 10px 22px rgba(44, 31, 28, 0.16), 0 18px 34px rgba(44, 31, 28, 0.18);
 }
 
 .rsvp-page .next-button:active {
@@ -1882,11 +2074,15 @@ h3 {
 
 .confirmation-script {
   margin: 0;
-  color: var(--red);
+  color: #f7ebdb;
   font-family: var(--font-script);
   font-weight: 400;
   font-size: 2rem;
   line-height: 1.2;
+}
+
+.loading-status-page .confirmation-script {
+  line-height: 1.4;
 }
 
 .confirmation-crest {
@@ -1902,7 +2098,7 @@ h3 {
   inset: 0;
   width: 100%;
   height: 100%;
-  color: rgba(142, 31, 29, 0.62);
+  color: rgba(247, 235, 219, 0.92);
   font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 600;
@@ -2002,6 +2198,31 @@ h3 {
 
   50% {
     transform: rotate(2deg);
+  }
+}
+
+@media (min-width: 641px) {
+  .rsvp-page .button-row {
+    width: min(100%, 520px);
+    margin: 0 auto;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .rsvp-page .button-row > button {
+    flex: 1 1 0;
+    max-width: none;
+    margin: 0;
+  }
+
+  .rsvp-page .button-row-right {
+    justify-content: center;
+  }
+
+  .rsvp-page .button-row-right > .next-button {
+    flex: 0 1 min(50%, 260px);
+    width: min(50%, 260px);
+    max-width: 100%;
   }
 }
 
@@ -2380,8 +2601,7 @@ h3 {
 
   .button-row > button {
     width: min(100%, 270px);
-    margin-right: auto;
-    margin-left: auto;
+    margin: 10px auto;
   }
 
   .button-row-right {
@@ -2390,8 +2610,7 @@ h3 {
 
   .button-row-right > button {
     width: 270px;;
-    margin-right: 0;
-    margin-left: 0;
+    margin: 10px 0;
   }
 
   .rsvp-page {
@@ -2406,7 +2625,6 @@ h3 {
     padding-right: 28px; */
   }
 
-  .rsvp-page h1,
   .confirmation-card h1 {
     font-size: 1.8rem;
   }

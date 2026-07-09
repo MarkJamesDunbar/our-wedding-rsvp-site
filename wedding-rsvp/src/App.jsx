@@ -13,6 +13,10 @@ import localInvitations from './data/invitations.json';
 
 const RESPONSE_STORAGE_PREFIX = 'rsvp-response:';
 
+function canUseLocalResponseFallback() {
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+}
+
 function ConfirmationStyleStatusPage({ message, detail, className = '' }) {
   useEffect(() => {
     const STATUS_INSET_COLOR = '#571216';
@@ -140,6 +144,10 @@ async function loadResponse(invitationId) {
     const data = await res.json();
     return data ? data.data : null;
   } catch {
+    if (!canUseLocalResponseFallback()) {
+      throw new Error('Response lookup failed');
+    }
+
     const key = `${RESPONSE_STORAGE_PREFIX}${invitationId}`;
     const local = localStorage.getItem(key);
     return local ? JSON.parse(local) : null;
@@ -158,6 +166,10 @@ async function saveResponse(invitationId, responses) {
       throw new Error('Save failed');
     }
   } catch {
+    if (!canUseLocalResponseFallback()) {
+      throw new Error('Save failed');
+    }
+
     const key = `${RESPONSE_STORAGE_PREFIX}${invitationId}`;
     localStorage.setItem(key, JSON.stringify(responses));
   }

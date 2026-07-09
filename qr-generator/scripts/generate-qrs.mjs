@@ -14,6 +14,11 @@ function sanitizeFilePart(value) {
   return String(value).replace(/[^a-zA-Z0-9-_]/g, '_');
 }
 
+function getGuestDisplayName(guest) {
+  if (guest?.name) return guest.name;
+  return [guest?.first_name, guest?.second_name].filter(Boolean).join(' ');
+}
+
 function escapeXml(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -92,12 +97,15 @@ async function main() {
   await fs.rm(outputPath, { recursive: true, force: true });
   await fs.mkdir(qrDir, { recursive: true });
 
-  const manifestRows = ['invite_id,primary_guest,url,qr_svg'];
+  const manifestRows = ['invite_id,primary_guest,all_guests,url,qr_svg'];
   let count = 0;
 
   for (const item of Object.values(invitations)) {
     const inviteId = item.qr_code;
     const guestName = item.primary_guest;
+    const allGuests = Array.isArray(item.guests)
+      ? item.guests.map(getGuestDisplayName).filter(Boolean).join(', ')
+      : '';
     const url = `${baseUrl}/?id=${encodeURIComponent(inviteId)}`;
 
     const qrSvg = await QRCode.toString(url, {
@@ -121,7 +129,7 @@ async function main() {
       : qrSvg;
     await fs.writeFile(path.join(qrDir, qrFile), outputSvg, 'utf8');
 
-    manifestRows.push([inviteId, guestName, url, `qrs/${qrFile}`].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','));
+    manifestRows.push([inviteId, guestName, allGuests, url, `qrs/${qrFile}`].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','));
     count += 1;
   }
 

@@ -44,8 +44,8 @@
       },
       {
         "id": "INV-002-guest-02",
-        "name": "Benjamin Ambroziak",
-        "first_name": "Benjamin",
+        "name": "Beniamin Ambroziak",
+        "first_name": "Beniamin",
         "second_name": "Ambroziak",
         "is_named": true,
         "is_child": false,
@@ -226,13 +226,13 @@
   "INV-009": {
     "qr_code": "INV-009",
     "invite_id": "9",
-    "primary_guest": "Roshan Bhowaneesing",
+    "primary_guest": "Veekash Bhowaneesing",
     "party_size": 4,
     "guests": [
       {
         "id": "INV-009-guest-01",
-        "name": "Roshan Bhowaneesing",
-        "first_name": "Roshan",
+        "name": "Veekash Bhowaneesing",
+        "first_name": "Veekash",
         "second_name": "Bhowaneesing",
         "is_named": true,
         "is_child": false,
@@ -240,15 +240,6 @@
       },
       {
         "id": "INV-009-guest-02",
-        "name": "Robynne Bhowaneesing",
-        "first_name": "Robynne",
-        "second_name": "Bhowaneesing",
-        "is_named": true,
-        "is_child": false,
-        "is_infant": false
-      },
-      {
-        "id": "INV-009-guest-03",
         "name": "Liza Sicam",
         "first_name": "Liza",
         "second_name": "Sicam",
@@ -257,9 +248,18 @@
         "is_infant": false
       },
       {
+        "id": "INV-009-guest-03",
+        "name": "Roshan Bhowaneesing",
+        "first_name": "Roshan",
+        "second_name": "Bhowaneesing",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      },
+      {
         "id": "INV-009-guest-04",
-        "name": "Veekash Bhowaneesing",
-        "first_name": "Veekash",
+        "name": "Robynne Bhowaneesing",
+        "first_name": "Robynne",
         "second_name": "Bhowaneesing",
         "is_named": true,
         "is_child": false,
@@ -272,13 +272,13 @@
   "INV-010": {
     "qr_code": "INV-010",
     "invite_id": "10",
-    "primary_guest": "Kayla Acosta",
+    "primary_guest": "Chris Acosta",
     "party_size": 4,
     "guests": [
       {
         "id": "INV-010-guest-01",
-        "name": "Kayla Acosta",
-        "first_name": "Kayla",
+        "name": "Chris Acosta",
+        "first_name": "Chris",
         "second_name": "Acosta",
         "is_named": true,
         "is_child": false,
@@ -286,15 +286,6 @@
       },
       {
         "id": "INV-010-guest-02",
-        "name": "Kamille Acosta",
-        "first_name": "Kamille",
-        "second_name": "Acosta",
-        "is_named": true,
-        "is_child": false,
-        "is_infant": false
-      },
-      {
-        "id": "INV-010-guest-03",
         "name": "Joyce Acosta",
         "first_name": "Joyce",
         "second_name": "Acosta",
@@ -303,9 +294,18 @@
         "is_infant": false
       },
       {
+        "id": "INV-010-guest-03",
+        "name": "Kayla Acosta",
+        "first_name": "Kayla",
+        "second_name": "Acosta",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      },
+      {
         "id": "INV-010-guest-04",
-        "name": "Chris Acosta",
-        "first_name": "Chris",
+        "name": "Kamille Acosta",
+        "first_name": "Kamille",
         "second_name": "Acosta",
         "is_named": true,
         "is_child": false,
@@ -582,18 +582,18 @@
       },
       {
         "id": "INV-018-guest-06",
-        "name": "Bianca",
+        "name": "Bianca Alexiou",
         "first_name": "Bianca",
-        "second_name": "",
+        "second_name": "Alexiou",
         "is_named": true,
         "is_child": false,
         "is_infant": false
       },
       {
         "id": "INV-018-guest-07",
-        "name": "John",
+        "name": "John Jiwoong Kwak",
         "first_name": "John",
-        "second_name": "",
+        "second_name": "Jiwoong Kwak",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -633,14 +633,14 @@
   "INV-020": {
     "qr_code": "INV-020",
     "invite_id": "20",
-    "primary_guest": "Lauren Alba",
+    "primary_guest": "Lauren",
     "party_size": 3,
     "guests": [
       {
         "id": "INV-020-guest-01",
-        "name": "Lauren Alba",
+        "name": "Lauren",
         "first_name": "Lauren",
-        "second_name": "Alba",
+        "second_name": "",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -670,14 +670,14 @@
   "INV-021": {
     "qr_code": "INV-021",
     "invite_id": "21",
-    "primary_guest": "Leng Alba",
+    "primary_guest": "Leng",
     "party_size": 2,
     "guests": [
       {
         "id": "INV-021-guest-01",
-        "name": "Leng Alba",
+        "name": "Leng",
         "first_name": "Leng",
-        "second_name": "Alba",
+        "second_name": "",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -924,9 +924,9 @@
       },
       {
         "id": "INV-027-guest-03",
-        "name": "Lin",
-        "first_name": "Lin",
-        "second_name": "",
+        "name": "Marylin Talaguit",
+        "first_name": "Marylin",
+        "second_name": "Talaguit",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -1235,12 +1235,21 @@
     "qr_code": "INV-036",
     "invite_id": "36",
     "primary_guest": "Rogelio Gines",
-    "party_size": 1,
+    "party_size": 2,
     "guests": [
       {
         "id": "INV-036-guest-01",
         "name": "Rogelio Gines",
         "first_name": "Rogelio",
+        "second_name": "Gines",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      },
+      {
+        "id": "INV-036-guest-02",
+        "name": "Nina Gines",
+        "first_name": "Nina",
         "second_name": "Gines",
         "is_named": true,
         "is_child": false,
@@ -1435,9 +1444,9 @@
       },
       {
         "id": "INV-043-guest-02",
-        "name": "Partner",
-        "first_name": "Partner",
-        "second_name": "",
+        "name": "Plus One",
+        "first_name": "Plus",
+        "second_name": "One",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -1463,27 +1472,27 @@
       },
       {
         "id": "INV-044-guest-02",
-        "name": "Sean",
+        "name": "Sean Owens",
         "first_name": "Sean",
-        "second_name": "",
+        "second_name": "Owens",
         "is_named": true,
         "is_child": false,
         "is_infant": false
       },
       {
         "id": "INV-044-guest-03",
-        "name": "Grace",
+        "name": "Grace Owens",
         "first_name": "Grace",
-        "second_name": "",
+        "second_name": "Owens",
         "is_named": true,
         "is_child": true,
         "is_infant": false
       },
       {
         "id": "INV-044-guest-04",
-        "name": "Jayden",
+        "name": "Jayden Owens",
         "first_name": "Jayden",
-        "second_name": "",
+        "second_name": "Owens",
         "is_named": true,
         "is_child": true,
         "is_infant": false
@@ -1509,27 +1518,27 @@
       },
       {
         "id": "INV-045-guest-02",
-        "name": "Laura",
+        "name": "Laura Marshall",
         "first_name": "Laura",
-        "second_name": "",
+        "second_name": "Marshall",
         "is_named": true,
         "is_child": false,
         "is_infant": false
       },
       {
         "id": "INV-045-guest-03",
-        "name": "Darcey",
+        "name": "Darcey Dunbar",
         "first_name": "Darcey",
-        "second_name": "",
+        "second_name": "Dunbar",
         "is_named": true,
         "is_child": true,
         "is_infant": false
       },
       {
         "id": "INV-045-guest-04",
-        "name": "Elsie",
+        "name": "Elsie Dunbar",
         "first_name": "Elsie",
-        "second_name": "",
+        "second_name": "Dunbar",
         "is_named": true,
         "is_child": true,
         "is_infant": false
@@ -1555,9 +1564,9 @@
       },
       {
         "id": "INV-046-guest-02",
-        "name": "Talia",
-        "first_name": "Talia",
-        "second_name": "",
+        "name": "Natalia Kowalczyk",
+        "first_name": "Natalia",
+        "second_name": "Kowalczyk",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -1583,9 +1592,9 @@
       },
       {
         "id": "INV-047-guest-02",
-        "name": "Tinka",
+        "name": "Tinka Bruneau",
         "first_name": "Tinka",
-        "second_name": "",
+        "second_name": "Bruneau",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -1691,13 +1700,13 @@
   "INV-052": {
     "qr_code": "INV-052",
     "invite_id": "52",
-    "primary_guest": "Robert Marshall Jr. Marshall",
+    "primary_guest": "Robert Marshall",
     "party_size": 1,
     "guests": [
       {
         "id": "INV-052-guest-01",
-        "name": "Robert Marshall Jr. Marshall",
-        "first_name": "Robert Marshall Jr.",
+        "name": "Robert Marshall",
+        "first_name": "Robert",
         "second_name": "Marshall",
         "is_named": true,
         "is_child": false,
@@ -2005,9 +2014,9 @@
       },
       {
         "id": "INV-064-guest-02",
-        "name": "Yara",
+        "name": "Yara Fares",
         "first_name": "Yara",
-        "second_name": "",
+        "second_name": "Fares",
         "is_named": true,
         "is_child": false,
         "is_infant": false

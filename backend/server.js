@@ -7,13 +7,17 @@ const path = require('path');
 const app = express();
 
 const connectionString = process.env.DATABASE_URL;
+
 if (!connectionString) {
   console.error('DATABASE_URL is required but was not set.');
   process.exit(1);
 }
 
 const corsOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean)
+  ? process.env.CORS_ORIGIN
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean)
   : null;
 
 app.use(cors(corsOrigins ? { origin: corsOrigins } : undefined));
@@ -21,65 +25,121 @@ app.use(express.json());
 
 console.log('Server starting...');
 console.log('DATABASE_URL:', connectionString ? 'set' : 'not set');
-console.log('=== ENVIRONMENT DEBUG ===');
 console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('DATABASE_URL exists:', !!connectionString);
-if (connectionString) {
-  const url = new URL(connectionString);
-  console.log('DB Host:', url.hostname);
-  console.log('DB Port:', url.port);
-  console.log('DB Name:', url.pathname);
-} else {
-  console.log('DATABASE_URL is NOT set!');
-}
-console.log('=== END DEBUG ===');
 
-const useSsl = process.env.DATABASE_SSL === 'true' || process.env.PGSSLMODE === 'require';
+const useSsl =
+  process.env.DATABASE_SSL === 'true' ||
+  process.env.PGSSLMODE === 'require';
 
 const pool = new Pool({
   connectionString,
-  ssl: useSsl ? { rejectUnauthorized: false } : undefined
+  ssl: useSsl
+    ? {
+        rejectUnauthorized: false
+      }
+    : undefined
 });
 
-pool.on('error', (err) => {
-  console.error('Pool error:', err.message);
+pool.on('error', (error) => {
+  console.error('PostgreSQL pool error:', error.message);
 });
 
 pool.on('connect', () => {
   console.log('Connected to PostgreSQL');
 });
 
-// Seed invitations from invitations.json (runs once on startup)
-async function seedInvitations() {
-  console.log('Seeding invitations from invitations.json...');
-  try {
-    const invitationsPath = path.join(__dirname, 'invitations.json');
-    console.log('Reading:', invitationsPath);
-    const invitations = JSON.parse(fs.readFileSync(invitationsPath, 'utf8'));
-    const entries = Object.values(invitations);
-    console.log('Found', entries.length, 'invitations to seed');
+function parseJsonField(value, fallback) {
+  if (value === null || value === undefined) {
+    return fallback;
+  }
 
-    let seeded = 0;
-    for (const inv of entries) {
-      await pool.query(
-        `INSERT INTO invitations (id, invite_id, primary_guest, party_size, guests)
-         VALUES ($1, $2, $3, $4, $5)
-         ON CONFLICT (id) DO UPDATE SET
-           invite_id = EXCLUDED.invite_id,
-           primary_guest = EXCLUDED.primary_guest,
-           party_size = EXCLUDED.party_size,
-           guests = EXCLUDED.guests`,
-        [inv.qr_code, inv.invite_id, inv.primary_guest, inv.party_size, JSON.stringify(inv.guests)]
-      );
-      seeded++;
-    }
-    console.log('Seeded', seeded, 'invitations (existing rows updated)');
-  } catch (err) {
-    console.warn('Seeding failed, server will continue without seed data:', err.message);
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
   }
 }
 
-// Create tables then seed
+function escapeCsv(value) {
+  return `"${String(value ?? '').replace(/"/g, '""')}"`;
+}
+
+// Inserts new invitations and updates existing invitation details.
+// This does not update or delete anything in the responses table.
+async function seedInvitations() {
+  console.log('Synchronising invitations from invitations.json...');
+
+  const invitationsPath = path.join(__dirname, 'invitations.json');
+  console.log('Reading:', invitationsPath);
+
+  if (!fs.existsSync(invitationsPath)) {
+    console.warn('invitations.json was not found. Skipping invitation sync.');
+    return;
+  }
+
+  const fileText = fs.readFileSync(invitationsPath, 'utf8');
+  const invitations = JSON.parse(fileText);
+  const entries = Object.values(invitations);
+
+  console.log(`Found ${entries.length} invitations in invitations.json`);
+
+  let inserted = 0;
+  let updated = 0;
+  let skipped = 0;
+
+  for (const invitation of entries) {
+    if (!invitation.qr_code) {
+      console.warn('Skipping invitation with no qr_code:', invitation);
+      skipped += 1;
+      continue;
+    }
+
+    const result = await pool.query(
+      `
+        INSERT INTO invitations (
+          id,
+          invite_id,
+          primary_guest,
+          party_size,
+          guests
+        )
+        VALUES ($1, $2, $3, $4, $5)
+
+        ON CONFLICT (id) DO UPDATE SET
+          invite_id = EXCLUDED.invite_id,
+          primary_guest = EXCLUDED.primary_guest,
+          party_size = EXCLUDED.party_size,
+          guests = EXCLUDED.guests
+
+        RETURNING (xmax = 0) AS inserted
+      `,
+      [
+        invitation.qr_code,
+        invitation.invite_id,
+        invitation.primary_guest,
+        invitation.party_size,
+        JSON.stringify(invitation.guests || [])
+      ]
+    );
+
+    if (result.rows[0]?.inserted) {
+      inserted += 1;
+    } else {
+      updated += 1;
+    }
+  }
+
+  console.log('Invitation synchronisation complete');
+  console.log(`Inserted: ${inserted}`);
+  console.log(`Updated: ${updated}`);
+  console.log(`Skipped: ${skipped}`);
+  console.log('Existing RSVP and menu responses were not modified.');
+}
+
 async function initDatabase() {
   try {
     await pool.query(`
@@ -91,6 +151,7 @@ async function initDatabase() {
         guests TEXT
       )
     `);
+
     console.log('Invitations table ready');
 
     await pool.query(`
@@ -102,14 +163,16 @@ async function initDatabase() {
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
     console.log('Responses table ready');
 
     await pool.query('SELECT NOW()');
     console.log('Database connection working');
 
     await seedInvitations();
-  } catch (err) {
-    console.error('Database initialisation failed:', err.message);
+  } catch (error) {
+    console.error('Database initialisation failed:', error.message);
+    throw error;
   }
 }
 
@@ -117,161 +180,290 @@ app.get('/healthz', (_req, res) => {
   res.status(200).json({ ok: true });
 });
 
-// Get invitation
-app.get('/api/invitation/:invitation_id', (req, res) => {
-  console.log('GET /api/invitation/', req.params.invitation_id);
-  pool.query('SELECT * FROM invitations WHERE id = $1', [req.params.invitation_id], (err, result) => {
-    if (err) {
-      console.error('Query error:', err.message);
-      res.status(500).json({ error: err.message });
-    } else if (result.rows.length > 0) {
-      const row = result.rows[0];
-      console.log('Found invitation:', row.id);
-      res.json({
-        qr_code: row.id,
-        invite_id: row.invite_id,
-        primary_guest: row.primary_guest,
-        party_size: row.party_size,
-        guests: JSON.parse(row.guests),
-        has_responded: false,
-        response: null
-      });
-    } else {
-      console.log('Invitation not found:', req.params.invitation_id);
-      res.status(404).json({ error: 'Not found' });
+// Get an invitation
+app.get('/api/invitation/:invitation_id', async (req, res) => {
+  const invitationId = req.params.invitation_id;
+
+  console.log('GET /api/invitation/', invitationId);
+
+  try {
+    const result = await pool.query(
+      `
+        SELECT
+          i.*,
+          r.response_data,
+          r.last_updated
+        FROM invitations i
+        LEFT JOIN responses r
+          ON i.id = r.invitation_id
+        WHERE i.id = $1
+      `,
+      [invitationId]
+    );
+
+    if (result.rows.length === 0) {
+      console.log('Invitation not found:', invitationId);
+      return res.status(404).json({ error: 'Not found' });
     }
-  });
+
+    const row = result.rows[0];
+    const response = parseJsonField(row.response_data, null);
+
+    console.log('Found invitation:', row.id);
+
+    return res.json({
+      qr_code: row.id,
+      invite_id: row.invite_id,
+      primary_guest: row.primary_guest,
+      party_size: row.party_size,
+      guests: parseJsonField(row.guests, []),
+      has_responded: response !== null,
+      response,
+      last_updated: row.last_updated || null
+    });
+  } catch (error) {
+    console.error('Invitation query error:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
 });
 
-// Save response
-app.post('/api/save-response', (req, res) => {
+// Save or update an RSVP response
+app.post('/api/save-response', async (req, res) => {
   const { invitation_id, response_data } = req.body;
+
+  if (!invitation_id) {
+    return res.status(400).json({
+      error: 'invitation_id is required'
+    });
+  }
+
+  if (!Array.isArray(response_data)) {
+    return res.status(400).json({
+      error: 'response_data must be an array'
+    });
+  }
+
   console.log('POST /api/save-response for', invitation_id);
-  pool.query(
-    `INSERT INTO responses (invitation_id, response_data, last_updated) VALUES ($1, $2, CURRENT_TIMESTAMP)
-     ON CONFLICT (invitation_id) DO UPDATE SET response_data = $2, last_updated = CURRENT_TIMESTAMP`,
-    [invitation_id, JSON.stringify(response_data)],
-    (err) => {
-      if (err) {
-        console.error('Save error:', err.message);
-        res.status(500).json({ error: err.message });
-      } else {
-        console.log('Response saved for', invitation_id);
-        res.json({ success: true });
-      }
+
+  try {
+    const invitationResult = await pool.query(
+      'SELECT id FROM invitations WHERE id = $1',
+      [invitation_id]
+    );
+
+    if (invitationResult.rows.length === 0) {
+      return res.status(404).json({
+        error: 'Invitation not found'
+      });
     }
-  );
+
+    await pool.query(
+      `
+        INSERT INTO responses (
+          invitation_id,
+          response_data,
+          last_updated
+        )
+        VALUES ($1, $2, CURRENT_TIMESTAMP)
+
+        ON CONFLICT (invitation_id) DO UPDATE SET
+          response_data = EXCLUDED.response_data,
+          last_updated = CURRENT_TIMESTAMP
+      `,
+      [invitation_id, JSON.stringify(response_data)]
+    );
+
+    console.log('Response saved for', invitation_id);
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Save error:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
 });
 
-// Get response
-app.get('/api/get-response/:invitation_id', (req, res) => {
-  console.log('GET /api/get-response/', req.params.invitation_id);
-  pool.query(
-    `SELECT response_data, last_updated FROM responses WHERE invitation_id = $1`,
-    [req.params.invitation_id],
-    (err, result) => {
-      if (err) {
-        console.error('Query error:', err.message);
-        res.status(500).json({ error: err.message });
-      } else if (result.rows.length > 0) {
-        const row = result.rows[0];
-        console.log('Found response for', req.params.invitation_id);
-        res.json({ data: JSON.parse(row.response_data), last_updated: row.last_updated });
-      } else {
-        console.log('No response yet for', req.params.invitation_id);
-        res.json(null);
-      }
+// Get an RSVP response
+app.get('/api/get-response/:invitation_id', async (req, res) => {
+  const invitationId = req.params.invitation_id;
+
+  console.log('GET /api/get-response/', invitationId);
+
+  try {
+    const result = await pool.query(
+      `
+        SELECT response_data, last_updated
+        FROM responses
+        WHERE invitation_id = $1
+      `,
+      [invitationId]
+    );
+
+    if (result.rows.length === 0) {
+      console.log('No response yet for', invitationId);
+      return res.json(null);
     }
-  );
+
+    const row = result.rows[0];
+
+    console.log('Found response for', invitationId);
+
+    return res.json({
+      data: parseJsonField(row.response_data, []),
+      last_updated: row.last_updated
+    });
+  } catch (error) {
+    console.error('Response query error:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
 });
 
-// Admin: Get all responses
-app.get('/api/admin/all-responses', (req, res) => {
+// Admin: get all invitations and responses
+app.get('/api/admin/all-responses', async (_req, res) => {
   console.log('GET /api/admin/all-responses');
-  pool.query(
-    `SELECT i.id, i.primary_guest, i.guests, r.response_data, r.last_updated 
-     FROM invitations i 
-     LEFT JOIN responses r ON i.id = r.invitation_id 
-     ORDER BY i.id ASC`,
-    (err, result) => {
-      if (err) {
-        console.error('Query error:', err.message);
-        res.status(500).json({ error: err.message });
-      } else {
-        const formatted = result.rows.map(row => {
-          const guests = JSON.parse(row.guests);
-          const responses = row.response_data ? JSON.parse(row.response_data) : null;
-          
-          return guests.map((guest, idx) => {
-            const response = responses ? responses[idx] : null;
-            return {
-              invitation_id: row.id,
-              primary_guest: row.primary_guest,
-              name: guest.name,
-              attended: response ? (response.attending ? 'Yes' : 'No') : 'Not yet responded',
-              course_1: response?.courses?.course_1 || '-',
-              course_2: response?.courses?.course_2 || '-',
-              course_3: response?.courses?.course_3 || '-',
-              dietary: response?.dietary || '-',
-              last_updated: row.last_updated || '-'
-            };
-          });
-        }).flat();
-        console.log('Returning', formatted.length, 'guest records');
-        res.json({ responses: formatted });
-      }
-    }
-  );
+
+  try {
+    const result = await pool.query(`
+      SELECT
+        i.id,
+        i.primary_guest,
+        i.guests,
+        r.response_data,
+        r.last_updated
+      FROM invitations i
+      LEFT JOIN responses r
+        ON i.id = r.invitation_id
+      ORDER BY i.id ASC
+    `);
+
+    const formatted = result.rows.flatMap((row) => {
+      const guests = parseJsonField(row.guests, []);
+      const responses = parseJsonField(row.response_data, null);
+
+      return guests.map((guest, index) => {
+        const response = Array.isArray(responses)
+          ? responses[index]
+          : null;
+
+        return {
+          invitation_id: row.id,
+          primary_guest: row.primary_guest,
+          name: guest.name,
+          attended: response
+            ? response.attending
+              ? 'Yes'
+              : 'No'
+            : 'Not yet responded',
+          course_1: response?.courses?.course_1 || '-',
+          course_2: response?.courses?.course_2 || '-',
+          course_3: response?.courses?.course_3 || '-',
+          dietary: response?.dietary || '-',
+          last_updated: row.last_updated || '-'
+        };
+      });
+    });
+
+    console.log('Returning', formatted.length, 'guest records');
+
+    return res.json({
+      responses: formatted
+    });
+  } catch (error) {
+    console.error('Admin query error:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
 });
 
-// Admin: Export CSV
-app.get('/api/admin/export-csv', (req, res) => {
+// Admin: export responses as CSV
+app.get('/api/admin/export-csv', async (_req, res) => {
   console.log('GET /api/admin/export-csv');
-  pool.query(
-    `SELECT i.id, i.primary_guest, i.guests, r.response_data, r.last_updated 
-     FROM invitations i 
-     LEFT JOIN responses r ON i.id = r.invitation_id 
-     ORDER BY i.id ASC`,
-    (err, result) => {
-      if (err) {
-        console.error('Query error:', err.message);
-        res.status(500).json({ error: err.message });
-      } else {
-        let csv = 'Invitation ID,Primary Guest,Guest Name,Attending,Course 1,Course 2,Course 3,Dietary Restrictions,Last Updated\n';
-        
-        result.rows.forEach(row => {
-          const guests = JSON.parse(row.guests);
-          const responses = row.response_data ? JSON.parse(row.response_data) : null;
-          
-          guests.forEach((guest, idx) => {
-            const response = responses ? responses[idx] : null;
-            const attended = response ? (response.attending ? 'Yes' : 'No') : 'Not yet responded';
-            const course1 = response?.courses?.course_1 || '-';
-            const course2 = response?.courses?.course_2 || '-';
-            const course3 = response?.courses?.course_3 || '-';
-            const dietary = response?.dietary || '-';
-            const lastUpdated = row.last_updated || '-';
-            
-            csv += `"${row.id}","${row.primary_guest}","${guest.name}","${attended}","${course1}","${course2}","${course3}","${dietary}","${lastUpdated}"\n`;
-          });
-        });
-        
-        console.log('CSV generated');
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', 'attachment; filename="rsvp-export.csv"');
-        res.send(csv);
-      }
+
+  try {
+    const result = await pool.query(`
+      SELECT
+        i.id,
+        i.primary_guest,
+        i.guests,
+        r.response_data,
+        r.last_updated
+      FROM invitations i
+      LEFT JOIN responses r
+        ON i.id = r.invitation_id
+      ORDER BY i.id ASC
+    `);
+
+    const csvRows = [
+      [
+        'Invitation ID',
+        'Primary Guest',
+        'Guest Name',
+        'Attending',
+        'Course 1',
+        'Course 2',
+        'Course 3',
+        'Dietary Restrictions',
+        'Last Updated'
+      ]
+        .map(escapeCsv)
+        .join(',')
+    ];
+
+    for (const row of result.rows) {
+      const guests = parseJsonField(row.guests, []);
+      const responses = parseJsonField(row.response_data, null);
+
+      guests.forEach((guest, index) => {
+        const response = Array.isArray(responses)
+          ? responses[index]
+          : null;
+
+        csvRows.push(
+          [
+            row.id,
+            row.primary_guest,
+            guest.name,
+            response
+              ? response.attending
+                ? 'Yes'
+                : 'No'
+              : 'Not yet responded',
+            response?.courses?.course_1 || '-',
+            response?.courses?.course_2 || '-',
+            response?.courses?.course_3 || '-',
+            response?.dietary || '-',
+            row.last_updated || '-'
+          ]
+            .map(escapeCsv)
+            .join(',')
+        );
+      });
     }
-  );
+
+    const csv = `${csvRows.join('\n')}\n`;
+
+    console.log('CSV generated');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename="rsvp-export.csv"'
+    );
+
+    return res.send(csv);
+  } catch (error) {
+    console.error('CSV export error:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
 });
 
-// Start server after database is ready
-initDatabase().then(() => {
-  const port = Number(process.env.PORT) || 3001;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+initDatabase()
+  .then(() => {
+    const port = Number(process.env.PORT) || 3001;
+
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Failed to initialise database:', error.message);
+    process.exit(1);
   });
-}).catch(err => {
-  console.error('Failed to initialize database:', err);
-  process.exit(1);
-});

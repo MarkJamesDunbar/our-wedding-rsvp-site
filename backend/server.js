@@ -357,6 +357,7 @@ app.get('/api/admin/all-responses', async (_req, res) => {
           course_2: response?.courses?.course_2 || '-',
           course_3: response?.courses?.course_3 || '-',
           dietary: response?.dietary || '-',
+          song_suggestion: response?.songSuggestion || '-',
           last_updated: row.last_updated || '-'
         };
       });
@@ -401,6 +402,7 @@ app.get('/api/admin/export-csv', async (_req, res) => {
         'Course 2',
         'Course 3',
         'Dietary Restrictions',
+        'Song Suggestion',
         'Last Updated'
       ]
         .map(escapeCsv)
@@ -430,6 +432,7 @@ app.get('/api/admin/export-csv', async (_req, res) => {
             response?.courses?.course_2 || '-',
             response?.courses?.course_3 || '-',
             response?.dietary || '-',
+            response?.songSuggestion || '-',
             row.last_updated || '-'
           ]
             .map(escapeCsv)

@@ -1869,6 +1869,10 @@ h3 {
   font-size: 1.1rem;
 }
 
+.song-request-field + .song-request-field {
+  margin-top: 10px;
+}
+
 .menu-choice-list,
 .menu-section-list {
   display: grid;

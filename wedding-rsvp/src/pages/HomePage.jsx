@@ -479,7 +479,7 @@ export default function HomePage() {
           </p>
 
           <Link className="landing-accent-button" to={rsvpHref}>
-            <span className="landing-accent-button-label">rsvp</span>
+            <span className="landing-accent-button-label">click to rsvp</span>
           </Link>
 
           <p className="landing-accent-deadline">rsvp by 31 Aug 2026</p>

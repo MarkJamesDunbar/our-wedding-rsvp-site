@@ -80,12 +80,13 @@ export default function AdminPortal() {
               <th>Course 2</th>
               <th>Course 3</th>
               <th>Dietary</th>
+              <th>Song Suggestion</th>
             </tr>
           </thead>
           <tbody>
             {responses.length === 0 ? (
               <tr>
-                <td colSpan="7" className="empty-row">
+                <td colSpan="8" className="empty-row">
                   No guests
                 </td>
               </tr>
@@ -113,6 +114,7 @@ export default function AdminPortal() {
                     <td>{resp.course_2}</td>
                     <td>{resp.course_3}</td>
                     <td>{resp.dietary}</td>
+                    <td>{resp.song_suggestion}</td>
                   </tr>
                 );
               })

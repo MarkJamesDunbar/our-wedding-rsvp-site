@@ -10,7 +10,7 @@ import planeDesign from '../assets/designs/plane.svg';
 import rsvpPageDesign from '../assets/designs/rsvp-page.webp';
 import timelineDesign from '../assets/designs/timeline-2.svg';
 
-export default function HomePage() {
+export default function HomePage({ invitation }) {
   const location = useLocation();
   const renderGap = (key, className = '') => (
     <div
@@ -58,6 +58,7 @@ export default function HomePage() {
 
   const rsvpPath = location.pathname.startsWith('/invite') ? '/invite/rsvp' : '/rsvp';
   const rsvpHref = `${rsvpPath}${location.search}`;
+  const hasInvitation = Boolean(invitation);
 
   return (
     <div className="page landing-page">
@@ -478,11 +479,15 @@ export default function HomePage() {
             <span>Isle of Bute</span>
           </p>
 
-          <Link className="landing-accent-button" to={rsvpHref}>
-            <span className="landing-accent-button-label">click to rsvp</span>
-          </Link>
+          {hasInvitation ? (
+            <Link className="landing-accent-button" to={rsvpHref}>
+              <span className="landing-accent-button-label">click to RSVP</span>
+            </Link>
+          ) : (
+            <p className="landing-accent-rsvp-note">Please use the QR code on your invite to RSVP.</p>
+          )}
 
-          <p className="landing-accent-deadline">rsvp by 31 Aug 2026</p>
+          <p className="landing-accent-deadline">RSVP by 31 October 2026</p>
         </div>
       </section>
     </div>

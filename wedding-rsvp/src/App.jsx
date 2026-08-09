@@ -12,6 +12,7 @@ import { apiPath } from './config/api';
 import localInvitations from './data/invitations.json';
 
 const RESPONSE_STORAGE_PREFIX = 'rsvp-response:';
+const localInvitationEntries = Object.values(localInvitations);
 
 function canUseLocalResponseFallback() {
   return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -118,13 +119,15 @@ async function loadInvitation(invitationId) {
 
     return await res.json();
   } catch {
-    const fallback = localInvitations[invitationId];
+    const fallback = localInvitations[invitationId]
+      || localInvitationEntries.find((invitation) => invitation.public_token === invitationId);
     if (!fallback) {
       return null;
     }
 
     return {
       qr_code: fallback.qr_code,
+      public_token: fallback.public_token,
       invite_id: fallback.invite_id,
       primary_guest: fallback.primary_guest,
       party_size: fallback.party_size,
@@ -177,9 +180,9 @@ async function saveResponse(invitationId, responses) {
 
 function AppContent() {
   const [searchParams] = useSearchParams();
-  const invitationId = searchParams.get('id');
+  const invitationLookupKey = searchParams.get('id');
   const [invitation, setInvitation] = useState(null);
-  const [loading, setLoading] = useState(Boolean(invitationId));
+  const [loading, setLoading] = useState(Boolean(invitationLookupKey));
   const LOADING_DEBUG_DELAY_MS = 3000;
 
   useEffect(() => {
@@ -188,20 +191,22 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
-    if (!invitationId) {
+    if (!invitationLookupKey) {
+      setInvitation(null);
+      setLoading(false);
       return;
     }
 
     async function loadData() {
       try {
-        const data = await loadInvitation(invitationId);
+        const data = await loadInvitation(invitationLookupKey);
         if (!data) {
           setInvitation(null);
           setLoading(false);
           return;
         }
 
-        const savedResponse = await loadResponse(invitationId);
+        const savedResponse = await loadResponse(data.qr_code);
         if (savedResponse) {
           setInvitation({ ...data, has_responded: true, response: savedResponse });
         } else {
@@ -217,10 +222,10 @@ function AppContent() {
     }
 
     loadData();
-  }, [invitationId]);
+  }, [invitationLookupKey]);
 
   const handleRsvpSubmit = async (responses) => {
-    await saveResponse(invitationId, responses);
+    await saveResponse(invitation.qr_code, responses);
     setInvitation((prev) => ({ ...prev, has_responded: true, response: responses }));
   };
 
@@ -230,16 +235,12 @@ function AppContent() {
         <Routes>
           <Route path="/admin" element={<AdminPortal />} />
 
-          {!invitationId && !loading && (
-            <Route
-              path="*"
-              element={
-                <ConfirmationStyleStatusPage
-                  message="Invalid Link"
-                  detail="Please check your invite QR code and try again. (Or reach out to Mark <3)"
-                />
-              }
-            />
+          {!loading && !invitationLookupKey && (
+            <>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/invite" element={<HomePage />} />
+              <Route path="*" element={<HomePage />} />
+            </>
           )}
 
           {invitation && !loading && (
@@ -267,6 +268,18 @@ function AppContent() {
             <Route
               path="*"
               element={<LoadingPagePreview />}
+            />
+          )}
+
+          {!loading && invitationLookupKey && !invitation && (
+            <Route
+              path="*"
+              element={
+                <ConfirmationStyleStatusPage
+                  message="Invalid Link"
+                  detail="Please check your invite QR code and try again. (Or reach out to Mark <3)"
+                />
+              }
             />
           )}
         </Routes>

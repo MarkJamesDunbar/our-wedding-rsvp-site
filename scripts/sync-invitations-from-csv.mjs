@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 const [, , csvPath, ...outputPaths] = process.argv;
 
@@ -50,6 +51,27 @@ function makeDisplayName(firstName, secondName) {
   return [firstName, secondName].map((part) => part.trim()).filter(Boolean).join(' ');
 }
 
+function makePublicToken(inviteId, guestNames, usedTokens) {
+  let salt = 0;
+
+  while (true) {
+    const token = crypto
+      .createHash('sha256')
+      .update(`${inviteId}|${guestNames.join('|')}|${salt}`)
+      .digest('base64url')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .slice(0, 8)
+      .toLowerCase();
+
+    if (!usedTokens.has(token)) {
+      usedTokens.add(token);
+      return token;
+    }
+
+    salt += 1;
+  }
+}
+
 const csvText = fs.readFileSync(csvPath, 'utf8');
 const rows = parseCsv(csvText);
 const invitationsById = new Map();
@@ -88,6 +110,16 @@ for (const row of rows) {
     is_infant: toBool(row.is_infant)
   });
   invitation.party_size = invitation.guests.length;
+}
+
+const usedTokens = new Set();
+
+for (const invitation of invitationsById.values()) {
+  invitation.public_token = makePublicToken(
+    invitation.invite_id,
+    invitation.guests.map((guest) => guest.name),
+    usedTokens
+  );
 }
 
 const sortedEntries = [...invitationsById.entries()].sort((left, right) => Number(left[0]) - Number(right[0]));

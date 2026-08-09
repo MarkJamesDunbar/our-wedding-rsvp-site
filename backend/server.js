@@ -68,6 +68,20 @@ function escapeCsv(value) {
   return `"${String(value ?? '').replace(/"/g, '""')}"`;
 }
 
+async function resolveInvitationKey(invitationKey) {
+  const result = await pool.query(
+    `
+      SELECT id
+      FROM invitations
+      WHERE id = $1 OR public_token = $1
+      LIMIT 1
+    `,
+    [invitationKey]
+  );
+
+  return result.rows[0]?.id || null;
+}
+
 // Inserts new invitations and updates existing invitation details.
 // This does not update or delete anything in the responses table.
 async function seedInvitations() {
@@ -102,14 +116,16 @@ async function seedInvitations() {
       `
         INSERT INTO invitations (
           id,
+          public_token,
           invite_id,
           primary_guest,
           party_size,
           guests
         )
-        VALUES ($1, $2, $3, $4, $5)
+        VALUES ($1, $2, $3, $4, $5, $6)
 
         ON CONFLICT (id) DO UPDATE SET
+          public_token = EXCLUDED.public_token,
           invite_id = EXCLUDED.invite_id,
           primary_guest = EXCLUDED.primary_guest,
           party_size = EXCLUDED.party_size,
@@ -119,6 +135,7 @@ async function seedInvitations() {
       `,
       [
         invitation.qr_code,
+        invitation.public_token || null,
         invitation.invite_id,
         invitation.primary_guest,
         invitation.party_size,
@@ -145,12 +162,16 @@ async function initDatabase() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS invitations (
         id TEXT PRIMARY KEY,
+        public_token TEXT,
         invite_id TEXT,
         primary_guest TEXT,
         party_size INTEGER,
         guests TEXT
       )
     `);
+
+    await pool.query(`ALTER TABLE invitations ADD COLUMN IF NOT EXISTS public_token TEXT`);
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS invitations_public_token_idx ON invitations (public_token)`);
 
     console.log('Invitations table ready');
 
@@ -196,7 +217,7 @@ app.get('/api/invitation/:invitation_id', async (req, res) => {
         FROM invitations i
         LEFT JOIN responses r
           ON i.id = r.invitation_id
-        WHERE i.id = $1
+        WHERE i.id = $1 OR i.public_token = $1
       `,
       [invitationId]
     );
@@ -213,6 +234,7 @@ app.get('/api/invitation/:invitation_id', async (req, res) => {
 
     return res.json({
       qr_code: row.id,
+      public_token: row.public_token,
       invite_id: row.invite_id,
       primary_guest: row.primary_guest,
       party_size: row.party_size,
@@ -246,12 +268,9 @@ app.post('/api/save-response', async (req, res) => {
   console.log('POST /api/save-response for', invitation_id);
 
   try {
-    const invitationResult = await pool.query(
-      'SELECT id FROM invitations WHERE id = $1',
-      [invitation_id]
-    );
+    const resolvedInvitationId = await resolveInvitationKey(invitation_id);
 
-    if (invitationResult.rows.length === 0) {
+    if (!resolvedInvitationId) {
       return res.status(404).json({
         error: 'Invitation not found'
       });
@@ -270,10 +289,10 @@ app.post('/api/save-response', async (req, res) => {
           response_data = EXCLUDED.response_data,
           last_updated = CURRENT_TIMESTAMP
       `,
-      [invitation_id, JSON.stringify(response_data)]
+      [resolvedInvitationId, JSON.stringify(response_data)]
     );
 
-    console.log('Response saved for', invitation_id);
+    console.log('Response saved for', resolvedInvitationId);
 
     return res.json({ success: true });
   } catch (error) {
@@ -289,23 +308,30 @@ app.get('/api/get-response/:invitation_id', async (req, res) => {
   console.log('GET /api/get-response/', invitationId);
 
   try {
+    const resolvedInvitationId = await resolveInvitationKey(invitationId);
+
+    if (!resolvedInvitationId) {
+      console.log('No response because invitation was not found for', invitationId);
+      return res.json(null);
+    }
+
     const result = await pool.query(
       `
         SELECT response_data, last_updated
         FROM responses
         WHERE invitation_id = $1
       `,
-      [invitationId]
+      [resolvedInvitationId]
     );
 
     if (result.rows.length === 0) {
-      console.log('No response yet for', invitationId);
+      console.log('No response yet for', resolvedInvitationId);
       return res.json(null);
     }
 
     const row = result.rows[0];
 
-    console.log('Found response for', invitationId);
+    console.log('Found response for', resolvedInvitationId);
 
     return res.json({
       data: parseJsonField(row.response_data, []),

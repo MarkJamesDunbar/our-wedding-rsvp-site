@@ -483,11 +483,9 @@ export default function HomePage({ invitation }) {
             <Link className="landing-accent-button" to={rsvpHref}>
               <span className="landing-accent-button-label">click to RSVP</span>
             </Link>
-          ) : (
-            <p className="landing-accent-rsvp-note">Please use the QR code on your invite to RSVP.</p>
-          )}
+          ) : null}
 
-          <p className="landing-accent-deadline">RSVP by 31 October 2026</p>
+          <p className="landing-accent-deadline">RSVP by 31 October 2026 using the QR Code Link on your Invitation</p>
         </div>
       </section>
     </div>

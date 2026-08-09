@@ -1222,16 +1222,6 @@ h3 {
   transform: translateY(-5px);
 }
 
-.landing-accent-rsvp-note {
-  margin: 0;
-  max-width: 22rem;
-  color: #313635;
-  font-family: var(--font-serif);
-  font-size: 1.28rem;
-  line-height: 1.35;
-  text-align: center;
-}
-
 .landing-accent-deadline {
   margin: 0;
   color: #313635;

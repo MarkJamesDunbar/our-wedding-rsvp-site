@@ -82,6 +82,25 @@ async function resolveInvitationKey(invitationKey) {
   return result.rows[0]?.id || null;
 }
 
+async function resolvePublicInvitation(invitationKey) {
+  const result = await pool.query(
+    `
+      SELECT
+        i.*,
+        r.response_data,
+        r.last_updated
+      FROM invitations i
+      LEFT JOIN responses r
+        ON i.id = r.invitation_id
+      WHERE i.public_token = $1
+      LIMIT 1
+    `,
+    [invitationKey]
+  );
+
+  return result.rows[0] || null;
+}
+
 // Inserts new invitations and updates existing invitation details.
 // This does not update or delete anything in the responses table.
 async function seedInvitations() {
@@ -208,26 +227,12 @@ app.get('/api/invitation/:invitation_id', async (req, res) => {
   console.log('GET /api/invitation/', invitationId);
 
   try {
-    const result = await pool.query(
-      `
-        SELECT
-          i.*,
-          r.response_data,
-          r.last_updated
-        FROM invitations i
-        LEFT JOIN responses r
-          ON i.id = r.invitation_id
-        WHERE i.id = $1 OR i.public_token = $1
-      `,
-      [invitationId]
-    );
+    const row = await resolvePublicInvitation(invitationId);
 
-    if (result.rows.length === 0) {
+    if (!row) {
       console.log('Invitation not found:', invitationId);
       return res.status(404).json({ error: 'Not found' });
     }
-
-    const row = result.rows[0];
     const response = parseJsonField(row.response_data, null);
 
     console.log('Found invitation:', row.id);

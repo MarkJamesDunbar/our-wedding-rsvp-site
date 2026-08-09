@@ -1073,19 +1073,16 @@ h3 {
   margin: 0;
   color: #151515;
   font-family: var(--font-recoleta);
-}
-
-.landing-dresscode-body {
-  max-width: 24ch;
   font-size: clamp(1.1rem, 2.3vh, 1.6rem);
   font-weight: 500;
   line-height: 1.18;
 }
 
+.landing-dresscode-body {
+  max-width: 24ch;
+}
+
 .landing-dresscode-emphasis {
-  font-size: clamp(1.25rem, 2.6vh, 1.8rem);
-  font-weight: 500;
-  line-height: 1.1;
 }
 
 .landing-dresscode-swatches {
@@ -1220,6 +1217,16 @@ h3 {
   display: block;
   line-height: 1;
   transform: translateY(-5px);
+}
+
+.landing-accent-rsvp-note {
+  margin: 0;
+  max-width: 22rem;
+  color: #313635;
+  font-family: var(--font-serif);
+  font-size: 1.28rem;
+  line-height: 1.35;
+  text-align: center;
 }
 
 .landing-accent-deadline {
@@ -2636,6 +2643,7 @@ h3 {
 
   .landing-dresscode-emphasis {
     font-size: 1.3rem;
+    line-height: 1.12;
   }
 
   .landing-dresscode-swatches {

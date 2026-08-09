@@ -390,8 +390,8 @@ export default function HomePage({ invitation }) {
           <p className="landing-dresscode-emphasis">Formal attire - there will be a ceilidh in the evening, so we recommend some comfortable shoes for dancing.</p>
 
           <p className="landing-dresscode-body">
-            We kindly ask that guests avoid wearing burgundy or deep red tones, as these are
-            reserved for our bridal party.
+            We kindly ask that guests avoid wearing white, burgundy or deep red tones, as these
+            are reserved for our bridal party.
           </p>
 
           <div className="landing-dresscode-swatches" aria-hidden="true">
@@ -483,9 +483,11 @@ export default function HomePage({ invitation }) {
             <Link className="landing-accent-button" to={rsvpHref}>
               <span className="landing-accent-button-label">click to RSVP</span>
             </Link>
-          ) : null}
+          ) : (
+            <p className="landing-accent-deadline landing-accent-deadline-generic">RSVP by 31 October 2026 using the QR Code Link on your Invitation</p>
+          )}
 
-          <p className="landing-accent-deadline">RSVP by 31 October 2026 using the QR Code Link on your Invitation</p>
+          {hasInvitation && <p className="landing-accent-deadline">RSVP by 31 October 2026</p>}
         </div>
       </section>
     </div>

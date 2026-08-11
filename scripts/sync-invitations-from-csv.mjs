@@ -72,9 +72,27 @@ function makePublicToken(inviteId, guestNames, usedTokens) {
   }
 }
 
+function loadExistingInvitations(outputPaths) {
+  for (const outputPath of outputPaths) {
+    const resolvedPath = path.resolve(outputPath);
+    if (!fs.existsSync(resolvedPath)) {
+      continue;
+    }
+
+    try {
+      return JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
+    } catch {
+      // Ignore unreadable files and keep looking for a usable existing output.
+    }
+  }
+
+  return {};
+}
+
 const csvText = fs.readFileSync(csvPath, 'utf8');
 const rows = parseCsv(csvText);
 const invitationsById = new Map();
+const existingInvitations = loadExistingInvitations(outputPaths);
 
 for (const row of rows) {
   const inviteId = String(row.invite_id).trim();
@@ -114,7 +132,19 @@ for (const row of rows) {
 
 const usedTokens = new Set();
 
+for (const invitation of Object.values(existingInvitations)) {
+  if (invitation?.public_token) {
+    usedTokens.add(invitation.public_token);
+  }
+}
+
 for (const invitation of invitationsById.values()) {
+  const existingInvitation = existingInvitations[invitation.qr_code];
+  if (existingInvitation?.public_token) {
+    invitation.public_token = existingInvitation.public_token;
+    continue;
+  }
+
   invitation.public_token = makePublicToken(
     invitation.invite_id,
     invitation.guests.map((guest) => guest.name),

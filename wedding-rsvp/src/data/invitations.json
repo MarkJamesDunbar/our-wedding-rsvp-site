@@ -532,7 +532,7 @@
     "qr_code": "INV-018",
     "invite_id": "18",
     "primary_guest": "Cora Alexiou",
-    "party_size": 7,
+    "party_size": 5,
     "guests": [
       {
         "id": "INV-018-guest-01",
@@ -578,24 +578,6 @@
         "is_named": true,
         "is_child": false,
         "is_infant": false
-      },
-      {
-        "id": "INV-018-guest-06",
-        "name": "Bianca Alexiou",
-        "first_name": "Bianca",
-        "second_name": "Alexiou",
-        "is_named": true,
-        "is_child": false,
-        "is_infant": false
-      },
-      {
-        "id": "INV-018-guest-07",
-        "name": "John Jiwoong Kwak",
-        "first_name": "John",
-        "second_name": "Jiwoong Kwak",
-        "is_named": true,
-        "is_child": false,
-        "is_infant": false
       }
     ],
     "has_responded": false,
@@ -634,32 +616,32 @@
   "INV-020": {
     "qr_code": "INV-020",
     "invite_id": "20",
-    "primary_guest": "Lauren",
+    "primary_guest": "Lauren Alba",
     "party_size": 3,
     "guests": [
       {
         "id": "INV-020-guest-01",
-        "name": "Lauren",
+        "name": "Lauren Alba",
         "first_name": "Lauren",
-        "second_name": "",
+        "second_name": "Alba",
         "is_named": true,
         "is_child": false,
         "is_infant": false
       },
       {
         "id": "INV-020-guest-02",
-        "name": "Miles",
-        "first_name": "Miles",
-        "second_name": "",
+        "name": "Myles Duyao",
+        "first_name": "Myles",
+        "second_name": "Duyao",
         "is_named": true,
         "is_child": false,
         "is_infant": false
       },
       {
         "id": "INV-020-guest-03",
-        "name": "Noa",
+        "name": "Noa Alba-Duyao",
         "first_name": "Noa",
-        "second_name": "",
+        "second_name": "Alba-Duyao",
         "is_named": true,
         "is_child": true,
         "is_infant": false
@@ -672,23 +654,23 @@
   "INV-021": {
     "qr_code": "INV-021",
     "invite_id": "21",
-    "primary_guest": "Leng",
+    "primary_guest": "Kathlynn Alba",
     "party_size": 2,
     "guests": [
       {
         "id": "INV-021-guest-01",
-        "name": "Leng",
-        "first_name": "Leng",
-        "second_name": "",
+        "name": "Kathlynn Alba",
+        "first_name": "Kathlynn",
+        "second_name": "Alba",
         "is_named": true,
         "is_child": false,
         "is_infant": false
       },
       {
         "id": "INV-021-guest-02",
-        "name": "Neko",
+        "name": "Neko Todriquez",
         "first_name": "Neko",
-        "second_name": "",
+        "second_name": "Todriquez",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -1042,7 +1024,7 @@
     "qr_code": "INV-030",
     "invite_id": "30",
     "primary_guest": "Ross Sicam",
-    "party_size": 6,
+    "party_size": 3,
     "guests": [
       {
         "id": "INV-030-guest-01",
@@ -1066,33 +1048,6 @@
         "id": "INV-030-guest-03",
         "name": "Isaac Sicam",
         "first_name": "Isaac",
-        "second_name": "Sicam",
-        "is_named": true,
-        "is_child": false,
-        "is_infant": false
-      },
-      {
-        "id": "INV-030-guest-04",
-        "name": "Kim Schmidt",
-        "first_name": "Kim",
-        "second_name": "Schmidt",
-        "is_named": true,
-        "is_child": false,
-        "is_infant": false
-      },
-      {
-        "id": "INV-030-guest-05",
-        "name": "Scott Schmidt",
-        "first_name": "Scott",
-        "second_name": "Schmidt",
-        "is_named": true,
-        "is_child": false,
-        "is_infant": false
-      },
-      {
-        "id": "INV-030-guest-06",
-        "name": "Sheela Sicam",
-        "first_name": "Sheela",
         "second_name": "Sicam",
         "is_named": true,
         "is_child": false,
@@ -2281,5 +2236,83 @@
     "has_responded": false,
     "response": null,
     "public_token": "ufswt89j"
+  },
+  "INV-076": {
+    "qr_code": "INV-076",
+    "invite_id": "76",
+    "primary_guest": "Bianca Alexiou",
+    "party_size": 2,
+    "guests": [
+      {
+        "id": "INV-076-guest-01",
+        "name": "Bianca Alexiou",
+        "first_name": "Bianca",
+        "second_name": "Alexiou",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      },
+      {
+        "id": "INV-076-guest-02",
+        "name": "John Jiwoong Kwak",
+        "first_name": "John",
+        "second_name": "Jiwoong Kwak",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      }
+    ],
+    "has_responded": false,
+    "response": null,
+    "public_token": "xrunphd3"
+  },
+  "INV-077": {
+    "qr_code": "INV-077",
+    "invite_id": "77",
+    "primary_guest": "Kim Schmidt",
+    "party_size": 1,
+    "guests": [
+      {
+        "id": "INV-077-guest-01",
+        "name": "Kim Schmidt",
+        "first_name": "Kim",
+        "second_name": "Schmidt",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      }
+    ],
+    "has_responded": false,
+    "response": null,
+    "public_token": "bfpuozom"
+  },
+  "INV-078": {
+    "qr_code": "INV-078",
+    "invite_id": "78",
+    "primary_guest": "Scott Schmidt",
+    "party_size": 2,
+    "guests": [
+      {
+        "id": "INV-078-guest-01",
+        "name": "Scott Schmidt",
+        "first_name": "Scott",
+        "second_name": "Schmidt",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      },
+      {
+        "id": "INV-078-guest-02",
+        "name": "Sheela Sicam",
+        "first_name": "Sheela",
+        "second_name": "Sicam",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      }
+    ],
+    "has_responded": false,
+    "response": null,
+    "public_token": "qpcjaweu"
   }
 }

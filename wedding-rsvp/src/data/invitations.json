@@ -2269,14 +2269,14 @@
   "INV-077": {
     "qr_code": "INV-077",
     "invite_id": "77",
-    "primary_guest": "Kim Schmidt",
+    "primary_guest": "Sheela Sicam",
     "party_size": 1,
     "guests": [
       {
         "id": "INV-077-guest-01",
-        "name": "Kim Schmidt",
-        "first_name": "Kim",
-        "second_name": "Schmidt",
+        "name": "Sheela Sicam",
+        "first_name": "Sheela",
+        "second_name": "Sicam",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -2289,13 +2289,13 @@
   "INV-078": {
     "qr_code": "INV-078",
     "invite_id": "78",
-    "primary_guest": "Scott Schmidt",
+    "primary_guest": "Kim Schmidt",
     "party_size": 2,
     "guests": [
       {
         "id": "INV-078-guest-01",
-        "name": "Scott Schmidt",
-        "first_name": "Scott",
+        "name": "Kim Schmidt",
+        "first_name": "Kim",
         "second_name": "Schmidt",
         "is_named": true,
         "is_child": false,
@@ -2303,9 +2303,9 @@
       },
       {
         "id": "INV-078-guest-02",
-        "name": "Sheela Sicam",
-        "first_name": "Sheela",
-        "second_name": "Sicam",
+        "name": "Scott Schmidt",
+        "first_name": "Scott",
+        "second_name": "Schmidt",
         "is_named": true,
         "is_child": false,
         "is_infant": false

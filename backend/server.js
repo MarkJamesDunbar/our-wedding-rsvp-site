@@ -68,6 +68,22 @@ function escapeCsv(value) {
   return `"${String(value ?? '').replace(/"/g, '""')}"`;
 }
 
+function getSongSuggestionText(response) {
+  if (Array.isArray(response?.songSuggestions)) {
+    const songs = response.songSuggestions
+      .map((song) => String(song || '').trim())
+      .filter(Boolean);
+
+    return songs.length > 0 ? songs.join(' | ') : '-';
+  }
+
+  if (typeof response?.songSuggestion === 'string' && response.songSuggestion.trim()) {
+    return response.songSuggestion.trim();
+  }
+
+  return '-';
+}
+
 async function resolveInvitationKey(invitationKey) {
   const result = await pool.query(
     `
@@ -388,7 +404,7 @@ app.get('/api/admin/all-responses', async (_req, res) => {
           course_2: response?.courses?.course_2 || '-',
           course_3: response?.courses?.course_3 || '-',
           dietary: response?.dietary || '-',
-          song_suggestion: response?.songSuggestion || '-',
+          song_suggestion: getSongSuggestionText(response),
           last_updated: row.last_updated || '-'
         };
       });
@@ -463,7 +479,7 @@ app.get('/api/admin/export-csv', async (_req, res) => {
             response?.courses?.course_2 || '-',
             response?.courses?.course_3 || '-',
             response?.dietary || '-',
-            response?.songSuggestion || '-',
+            getSongSuggestionText(response),
             row.last_updated || '-'
           ]
             .map(escapeCsv)

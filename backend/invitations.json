@@ -664,22 +664,13 @@
     "qr_code": "INV-021",
     "invite_id": "21",
     "primary_guest": "Kathlynn Alba",
-    "party_size": 2,
+    "party_size": 1,
     "guests": [
       {
         "id": "INV-021-guest-01",
         "name": "Kathlynn Alba",
         "first_name": "Kathlynn",
         "second_name": "Alba",
-        "is_named": true,
-        "is_child": false,
-        "is_infant": false
-      },
-      {
-        "id": "INV-021-guest-02",
-        "name": "Neko Todriquez",
-        "first_name": "Neko",
-        "second_name": "Todriquez",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -1003,23 +994,23 @@
   "INV-029": {
     "qr_code": "INV-029",
     "invite_id": "29",
-    "primary_guest": "Kenette Sicam",
+    "primary_guest": "Kenette Pimentel",
     "party_size": 2,
     "guests": [
       {
         "id": "INV-029-guest-01",
-        "name": "Kenette Sicam",
+        "name": "Kenette Pimentel",
         "first_name": "Kenette",
-        "second_name": "Sicam",
+        "second_name": "Pimentel",
         "is_named": true,
         "is_child": false,
         "is_infant": false
       },
       {
         "id": "INV-029-guest-02",
-        "name": "Alice Sicam",
+        "name": "Alice Cornelio",
         "first_name": "Alice",
-        "second_name": "Sicam",
+        "second_name": "Cornelio",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -2160,14 +2151,14 @@
   "INV-072": {
     "qr_code": "INV-072",
     "invite_id": "72",
-    "primary_guest": "Meg Tatum",
+    "primary_guest": "Meg Tatam",
     "party_size": 2,
     "guests": [
       {
         "id": "INV-072-guest-01",
-        "name": "Meg Tatum",
+        "name": "Meg Tatam",
         "first_name": "Meg",
-        "second_name": "Tatum",
+        "second_name": "Tatam",
         "is_named": true,
         "is_child": false,
         "is_infant": false

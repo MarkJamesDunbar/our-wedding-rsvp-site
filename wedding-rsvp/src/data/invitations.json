@@ -494,7 +494,7 @@
     "qr_code": "INV-017",
     "invite_id": "17",
     "primary_guest": "Gemma Sicam",
-    "party_size": 3,
+    "party_size": 4,
     "guests": [
       {
         "id": "INV-017-guest-01",
@@ -519,6 +519,15 @@
         "name": "Maxine Dizon",
         "first_name": "Maxine",
         "second_name": "Dizon",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      },
+      {
+        "id": "INV-017-guest-04",
+        "name": "Chelsea",
+        "first_name": "Chelsea",
+        "second_name": "",
         "is_named": true,
         "is_child": false,
         "is_infant": false
@@ -1651,13 +1660,22 @@
     "qr_code": "INV-051",
     "invite_id": "51",
     "primary_guest": "Robert Marshall",
-    "party_size": 1,
+    "party_size": 2,
     "guests": [
       {
         "id": "INV-051-guest-01",
         "name": "Robert Marshall",
         "first_name": "Robert",
         "second_name": "Marshall",
+        "is_named": true,
+        "is_child": false,
+        "is_infant": false
+      },
+      {
+        "id": "INV-051-guest-02",
+        "name": "Olivia Moncur",
+        "first_name": "Olivia",
+        "second_name": "Moncur",
         "is_named": true,
         "is_child": false,
         "is_infant": false
